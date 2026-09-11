@@ -1,3 +1,17 @@
+# Python / backend
+.venv/
+__pycache__/
+*.pyc
+.env
+
+# Project guide files (not part of the shared/graded code)
+CLAUDE.md
+quiz.md
+progress.md
+revise.md
+notes/
+.claude/
+
 # Logs
 logs
 *.log
@@ -7,6 +21,7 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
+# Node / frontend
 node_modules
 dist
 dist-ssr
