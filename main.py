@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from fastapi import Depends
+from fastapi import Depends, HTTPException
 from sqlalchemy.orm import Session
 from database import get_db
 from models import User
@@ -15,3 +15,13 @@ def read_root():
 @app.get("/users")
 def get_users(db: Session = Depends(get_db)):
     return db.query(User).all()
+
+
+@app.get("/users/{user_id}")
+def get_user(user_id: int, db: Session = Depends(get_db)):
+    user = db.query(User).filter_by(id=user_id).first()
+
+    if not user:
+        raise HTTPException(status_code=404, detail=f"User with {user_id} not found.")
+
+    return user
