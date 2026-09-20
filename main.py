@@ -3,6 +3,7 @@ from fastapi import Depends, HTTPException
 from sqlalchemy.orm import Session
 from database import get_db
 from models import User
+from schemas import UserCreate
 
 app = FastAPI()
 
@@ -25,3 +26,12 @@ def get_user(user_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail=f"User with {user_id} not found.")
 
     return user
+
+
+@app.post("/users")
+def create_user(user: UserCreate, db: Session = Depends(get_db)):
+    new_user = User(username=user.username)
+    db.add(new_user)
+    db.commit()
+    db.refresh(new_user)
+    return new_user
