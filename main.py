@@ -2,8 +2,8 @@ from fastapi import FastAPI
 from fastapi import Depends, HTTPException
 from sqlalchemy.orm import Session
 from database import get_db
-from models import User
-from schemas import UserCreate
+from models import User, Profile
+from schemas import UserCreate, ProfileCreate
 
 app = FastAPI()
 
@@ -45,3 +45,22 @@ def get_user_profiles(user_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail=f"User with {user_id} not found")
 
     return user.profiles
+
+
+@app.post("/users/{user_id}/profiles")
+def create_user_profile(
+    user_id: int, profile: ProfileCreate, db: Session = Depends(get_db)
+):
+    user = db.query(User).filter_by(id=user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail=f"User with {user_id} not found.")
+
+    new_profile = Profile(
+        user_id=user_id, platform=profile.platform, handle=profile.handle
+    )
+
+    db.add(new_profile)
+    db.commit()
+    db.refresh(new_profile)
+
+    return new_profile
