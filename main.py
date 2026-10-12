@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 from database import get_db
 from models import User, Profile
 from schemas import UserCreate, ProfileCreate
+from platforms import fetch_codeforces, fetch_leetcode
 
 app = FastAPI()
 
@@ -80,3 +81,49 @@ def delete_user(user_id: int, confirm: bool = False, db: Session = Depends(get_d
         )
     db.delete(user)
     db.commit()
+
+
+@app.get("/users/{user_id}/stats")
+def get_user_stats(user_id: int, db: Session = Depends(get_db)):
+    user = db.query(User).filter_by(id=user_id).first()
+
+    if not user:
+        raise HTTPException(status_code=404, detail=f"User with {user_id} not found")
+
+    results = []
+
+    for p in user.profiles:
+        platform = p.platform.lower()
+        if platform == "codeforces":
+            stats = fetch_codeforces(p.handle)
+
+        elif platform == "leetcode":
+            stats = fetch_leetcode(p.handle)
+
+        else:
+            stats = None
+
+        results.append({"platform": p.platform, "handle": p.handle, "stats": stats})
+
+    cf_ratings = [
+        r["stats"]["rating"]
+        for r in results
+        if r["platform"].lower() == "codeforces"
+        and r["stats"]
+        and r["stats"]["rating"] is not None
+    ]
+
+    lc_solved = [
+        r["stats"]["all"]
+        for r in results
+        if r["platform"].lower() == "leetcode" and r["stats"]
+    ]
+
+    summary = {
+        "profiles_linked": len(results),
+        "profiles_resolved": sum(1 for r in results if r["stats"]),
+        "best_codeforces_rating": max(cf_ratings, default=None),
+        "leetcode_total_solved": sum(lc_solved),
+    }
+
+    return {"username": user.username, "summary": summary, "profiles": results}
