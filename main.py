@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 from database import get_db
 from models import User, Profile
 from schemas import UserCreate, ProfileCreate
+from platforms import fetch_codeforces
 
 app = FastAPI()
 
@@ -80,3 +81,24 @@ def delete_user(user_id: int, confirm: bool = False, db: Session = Depends(get_d
         )
     db.delete(user)
     db.commit()
+
+
+@app.get("/users/{user_id}/stats")
+def get_user_stats(user_id: int, db: Session = Depends(get_db)):
+    user = db.query(User).filter_by(id=user_id).first()
+
+    if not user:
+        raise HTTPException(status_code=404, detail=f"User with {user_id} not found")
+
+    results = []
+
+    for p in user.profiles:
+        if p.platform.lower() == "codeforces":
+            stats = fetch_codeforces(p.handle)
+
+        else:
+            stats = None
+
+        results.append({"platform": p.platform, "handle": p.handle, "stats": stats})
+
+    return {"username": user.username, "profiles": results}
