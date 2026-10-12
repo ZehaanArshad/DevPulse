@@ -1,3 +1,5 @@
+from typing import Literal
+
 from pydantic import BaseModel
 
 
@@ -6,5 +8,5 @@ class UserCreate(BaseModel):
 
 
 class ProfileCreate(BaseModel):
-    platform: str
+    platform: Literal["codeforces", "leetcode"]
     handle: str
