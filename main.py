@@ -105,4 +105,25 @@ def get_user_stats(user_id: int, db: Session = Depends(get_db)):
 
         results.append({"platform": p.platform, "handle": p.handle, "stats": stats})
 
-    return {"username": user.username, "profiles": results}
+    cf_ratings = [
+        r["stats"]["rating"]
+        for r in results
+        if r["platform"].lower() == "codeforces"
+        and r["stats"]
+        and r["stats"]["rating"] is not None
+    ]
+
+    lc_solved = [
+        r["stats"]["all"]
+        for r in results
+        if r["platform"].lower() == "leetcode" and r["stats"]
+    ]
+
+    summary = {
+        "profiles_linked": len(results),
+        "profiles_resolved": sum(1 for r in results if r["stats"]),
+        "best_codeforces_rating": max(cf_ratings, default=None),
+        "leetcode_total_solved": sum(lc_solved),
+    }
+
+    return {"username": user.username, "summary": summary, "profiles": results}
