@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from database import get_db
 from models import User, Profile
 from schemas import UserCreate, ProfileCreate
-from platforms import fetch_codeforces
+from platforms import fetch_codeforces, fetch_leetcode
 
 app = FastAPI()
 
@@ -92,9 +92,14 @@ def get_user_stats(user_id: int, db: Session = Depends(get_db)):
 
     results = []
 
+    platform = p.platform.lower()
+
     for p in user.profiles:
-        if p.platform.lower() == "codeforces":
+        if platform == "codeforces":
             stats = fetch_codeforces(p.handle)
+
+        elif platform == "leetcode":
+            stats = fetch_leetcode(p.handle)
 
         else:
             stats = None
