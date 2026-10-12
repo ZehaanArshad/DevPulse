@@ -92,9 +92,8 @@ def get_user_stats(user_id: int, db: Session = Depends(get_db)):
 
     results = []
 
-    platform = p.platform.lower()
-
     for p in user.profiles:
+        platform = p.platform.lower()
         if platform == "codeforces":
             stats = fetch_codeforces(p.handle)
 
