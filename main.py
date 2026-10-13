@@ -57,18 +57,22 @@ def create_user_profile(
     if not user:
         raise HTTPException(status_code=404, detail=f"User with {user_id} not found.")
 
-    existing = db.query(Profile)
-    .filter(Profile.user_id == user_id,
-     Profile.platform=profile.platform,
-     func.lower(Profile.handle)==profile.handle.lower(),)
-    .first())
+    existing = (
+        db.query(Profile)
+        .filter(
+            Profile.user_id == user_id,
+            Profile.platform == profile.platform,
+            func.lower(Profile.handle) == profile.handle.lower(),
+        )
+        .first()
+    )
 
     if existing:
         raise HTTPException(
             status_code=409,
             detail=f"{profile.platform} handle {profile.handle} is already linked to this user",
         )
-    
+
     new_profile = Profile(
         user_id=user_id, platform=profile.platform, handle=profile.handle
     )
