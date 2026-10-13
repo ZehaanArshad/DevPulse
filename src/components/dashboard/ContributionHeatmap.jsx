@@ -11,6 +11,10 @@ function ContributionHeatmap({ heatmap }) {
   for (let i = 0; i < heatmap.cells.length; i += 7) {
     weeks.push(heatmap.cells.slice(i, i + 7))
   }
+  // weeks ek 2D array ban jata hai: [[7 din], [7 din], ...].
+    // Har week ke pehle din ka month number (1-12), date string se
+  const monthOfWeek = weeks.map((week) => Number(week[0].date.slice(5, 7)))
+// weeks[0]  -> week[0].date -> '2026-03-15' -> 03
 
   return (
     <div className="min-w-0 backdrop-blur-xl bg-[#9CC0ED]/50 border border-[#9CC0ED] rounded-2xl p-5">
@@ -31,30 +35,41 @@ function ContributionHeatmap({ heatmap }) {
         </button>
       </div>
 
-      <div className="overflow-x-auto pb-2">
-  <div className="w-max">
-
-    <div className="flex gap-0.5">
+      <div className="flex gap-0.5 overflow-x-auto overflow-y-hidden [scrollbar-color:#9CC0ED_transparent] p-7 -m-7">
+        {/* Code kis order me chalta hai? (1 week div, uske 7 cells, phir agla) */}
         {weeks.map((week, weekIndex) => (
-          <div key={weekIndex} className="flex flex-col gap-0.5">
-            {week.map((intensity, dayIndex) => (
+          <div key={weekIndex} className="flex flex-col gap-0.5 ">   {/* ← 52 div banta hai (har week ke liye 1) */}
+            
+            {week.map((cell) => (
               <div
-                key={dayIndex}
-                className={`w-[15px] h-[15px] rounded-sm ${intensityColor[intensity]}`}
-              />
-            ))}
+              key={cell.date}
+              className={`group relative w-[14px] h-[14px] rounded-sm ${intensityColor[cell.intensity]}`}
+              >
+              
+                <span
+                className="hidden group-hover:block absolute bottom-full -translate-x-1/3 z-10 whitespace-nowrap pointer-events-none rounded bg-[#9CC0ED] px-1 py-1 text-xs text-black font-mono">
+                  {cell.date}
+                  </span>
+                  </div>
+
+              ))}
+              {/* weeks>week>cell(1 din) */}
+
+              <div className="relative h-4 mt-1">
+              <span className="absolute left-0 text-xs text-neutral-900 whitespace-nowrap">
+                {weekIndex === 0 || monthOfWeek[weekIndex] !== monthOfWeek[weekIndex - 1]
+                  ? heatmap.months[monthOfWeek[weekIndex] - 1].slice(0, 3)
+                  : ''}
+              </span>
+            </div>
+
+
           </div>
         ))}
+        
       </div>
 
-      <div className="flex justify-between text-xs text-neutral-500 mt-2">
-        {heatmap.months.map((month) => (
-          <span key={month}>{month}</span>
-        ))}
-      </div>
 
-  </div>
-</div>
     </div>
   )
 }

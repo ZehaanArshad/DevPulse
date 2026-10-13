@@ -12,9 +12,10 @@ function Dashboard() {
       <Header />
 
       <div className="flex flex-wrap gap-4 px-8 py-4">
-        <PlatformDropdown title="Problem Solving Stats" to="/section/problem-solving" items={dashboardData.problemPlatforms} />
+        <PlatformDropdown title="Problem Solving Stats" to="/" items={dashboardData.problemPlatforms} />
         <PlatformDropdown title="Development Stats" to="/section/development" items={dashboardData.devPlatforms} />
-        <PlatformDropdown title="Connect with me" to="/section/connect" items={dashboardData.connectLinks} />
+        <PlatformDropdown title="Connect with me" items={dashboardData.connectLinks} />
+
       </div>
 
       <div className="grid grid-cols-[150px_1fr_320px] gap-4 px-8 pb-4 ">
