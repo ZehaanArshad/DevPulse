@@ -35,7 +35,7 @@ function ContributionHeatmap({ heatmap }) {
         </button>
       </div>
 
-      <div className="flex gap-0.5 overflow-x-auto overflow-y-hidden [scrollbar-color:#9CC0ED_transparent] p-7 -m-7">
+      <div className="flex gap-0.5 overflow-x-auto overflow-y-hidden [scrollbar-color:#9CC0ED_transparent] p-8 -m-8">
         {/* Code kis order me chalta hai? (1 week div, uske 7 cells, phir agla) */}
         {weeks.map((week, weekIndex) => (
           <div key={weekIndex} className="flex flex-col gap-0.5 ">   {/* ← 52 div banta hai (har week ke liye 1) */}
@@ -43,11 +43,11 @@ function ContributionHeatmap({ heatmap }) {
             {week.map((cell) => (
               <div
               key={cell.date}
-              className={`group relative w-[14px] h-[14px] rounded-sm ${intensityColor[cell.intensity]}`}
+              className={`group relative w-[14px] h-[14px] rounded-sm hover:border-1 border-black ${intensityColor[cell.intensity]}`}
               >
               
                 <span
-                className="hidden group-hover:block absolute bottom-full -translate-x-1/3 z-10 whitespace-nowrap pointer-events-none rounded bg-[#9CC0ED]/50 px-1 py-1 text-xs text-black font-mono shadow-md shadow-[#9CC0ED] border border-[#9CC0ED]">
+                className="backdrop-blur-sm hidden group-hover:block absolute bottom-full -translate-x-1/3 -translate-y-1/5 z-10 whitespace-nowrap pointer-events-none rounded bg-[#9CC0ED]/50 px-1 py-1 text-xs text-black font-mono shadow-sm shadow-[#9CC0ED] border border-[#9CC0ED]">
                   {cell.date}
                   </span>
                   </div>
