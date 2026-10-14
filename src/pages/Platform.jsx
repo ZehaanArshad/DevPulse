@@ -4,13 +4,14 @@ import PlatformStrip from '../components/dashboard/PlatformStrip'
 import { dashboardData } from '../data/dashboardData'
 
 const groups = [
-  { tabTo: '/', items: dashboardData.problemPlatforms },
-  { tabTo: '/section/development', items: dashboardData.devPlatforms },
+  { id: 'problem-solving', tabTo: '/', items: dashboardData.problemPlatforms },
+  { id: 'development', tabTo: '/platform/github', items: dashboardData.devPlatforms },
+  { id: 'connect', tabTo: '/platform/connect', items: dashboardData.connectLinks },
 ]
 
 function Platform() {
   const { name } = useParams()
-  const group = groups.find((g) => g.items.some((item) => item.key === name))
+    const group = groups.find((g) => g.id === name || g.items.some((item) => item.key === name))
 
   return (
     <div className="min-h-screen bg-[#FCF2E9] text-neutral-900">

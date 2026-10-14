@@ -37,9 +37,9 @@ function PlatformStrip({ items, activeKey }) {
                 target="_blank"
                 rel="noreferrer"
                 aria-label={`Open ${item.label}`}
-                className="flex items-center px-3 hover:bg-[#9CC0ED]"
+                className="flex items-center px-3"
               >
-                <span className="material-symbols-outlined text-neutral-900">open_in_new</span>
+                <span className="material-symbols-outlined text-neutral-900 hover:text-[#9CC0ED]">open_in_new</span>
               </a>
             )}
           </div>

@@ -3,8 +3,9 @@ import { Link, useLocation } from 'react-router-dom'
 
 const tabs = [
   { id: 'problem-solving', title: 'Problem Solving Stats', to: '/' },
-  { id: 'development', title: 'Development Stats', to: '/section/development' },
-  { id: 'connect', title: 'Connect with me', to: '/section/connect' },
+    { id: 'development', title: 'Development Stats', to: '/platform/github' },
+    { id: 'connect', title: 'Connect with me', to: '/platform/connect' },
+
 ]
 
 function Header({ activeTo }) {

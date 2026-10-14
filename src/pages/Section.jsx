@@ -4,7 +4,6 @@ import PlatformStrip from '../components/dashboard/PlatformStrip'
 import { dashboardData } from '../data/dashboardData'
 
 const sections = {
-  'problem-solving': { title: 'Problem Solving Stats', items: dashboardData.problemPlatforms },
   development: { title: 'Development Stats', items: dashboardData.devPlatforms },
   connect: { title: 'Connect with me', items: dashboardData.connectLinks },
 }
