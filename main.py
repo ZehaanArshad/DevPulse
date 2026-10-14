@@ -6,6 +6,8 @@ from models import User, Profile
 from schemas import UserCreate, ProfileCreate
 from platforms import fetch_codeforces, fetch_leetcode
 from sqlalchemy import func
+from schemas import UserCreate, UserOut
+from auth import hash_password
 
 app = FastAPI()
 
@@ -30,12 +32,23 @@ def get_user(user_id: int, db: Session = Depends(get_db)):
     return user
 
 
-@app.post("/users")
-def create_user(user: UserCreate, db: Session = Depends(get_db)):
-    new_user = User(username=user.username)
+@app.post("/signup", response_model=UserOut, status_code=201)
+def signup(user: UserCreate, db: Session = Depends(get_db)):
+    existing_user = db.query(User.username).filter_by(username=user.username).first()
+
+    if existing_user:
+        raise HTTPException(
+            status_code=409, detail=f"The user already exists,please sign in"
+        )
+
+    new_user = User(
+        username=user.username, hashed_password=hash_password(user.password)
+    )
+
     db.add(new_user)
     db.commit()
     db.refresh(new_user)
+
     return new_user
 
 
