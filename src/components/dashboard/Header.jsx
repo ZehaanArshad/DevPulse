@@ -1,5 +1,6 @@
 import logo from '../../assets/logo.gif'
 import { Link, useLocation } from 'react-router-dom'
+import PlatformStrip from './PlatformStrip'
 
 const tabs = [
   { id: 'problem-solving', title: 'Problem Solving Stats', to: '/' },
@@ -8,12 +9,12 @@ const tabs = [
 
 ]
 
-function Header({ activeTo }) {
+function Header({ activeTo, items, activeKey }) {
   const { pathname } = useLocation()
   const onAuthPage = pathname === '/login' || pathname === '/signup'
 
   return (
-    <header className="flex items-center justify-between px-8 py-4 border-b border-[#9CC0ED] flex-wrap ">
+    <header className="flex items-center justify-between px-8 py-4 flex-wrap ">
       <a href="/" className="flex items-center gap-3 cursor-pointer">
         <img src={logo} alt="Dev Pulse logo" className="w-25 h-10 rounded-lg object-cover" />
         <span className="text-xl font-extrabold uppercase tracking-widest text-[#8A1919] cursor-pointer">Dev Pulse</span>
@@ -51,6 +52,8 @@ function Header({ activeTo }) {
           <span className="material-symbols-outlined text-black text-2xl -translate-x-0.5">Login</span>
         </Link>
       </div>
+      
+      {items && <PlatformStrip items={items} activeKey={activeKey} />}
     </header>
   )
 }
