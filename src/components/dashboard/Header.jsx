@@ -1,6 +1,7 @@
 import logo from '../../assets/logo.gif'
 import { Link, useLocation } from 'react-router-dom'
 import PlatformStrip from './PlatformStrip'
+import newimg from '../../assets/new3.gif'
 
 const tabs = [
   { id: 'problem-solving', title: 'Problem Solving Stats', to: '/' },
@@ -14,7 +15,8 @@ function Header({ activeTo, items, activeKey }) {
   const onAuthPage = pathname === '/login' || pathname === '/signup'
 
   return (
-    <header className="flex items-center justify-between px-8 py-4 flex-wrap font-serif">
+    <header style={{ backgroundImage: `url(${newimg})` }}
+    className="flex items-center justify-between px-8 pt-2 pb-4 mb-4 flex-wrap font-sans hover:shadow-sm shadow-[#9CC0ED]">
       <a href="/" className="flex items-center gap-3 cursor-pointer">
         <img src={logo} alt="Dev Pulse logo" className="w-25 h-10 rounded-lg object-cover" />
         <span className="text-xl font-extrabold uppercase tracking-widest text-[#8A1919] cursor-pointer">Dev Pulse</span>
@@ -25,9 +27,8 @@ function Header({ activeTo, items, activeKey }) {
           {tabs.map((tab) => {
             const isCurrentPage = pathname === tab.to
             const isHighlighted = (activeTo ?? pathname) === tab.to
-            const classes = `px-4 py-2 text-sm font-semibold text-neutral-900 rounded-full ${
-              isHighlighted ? 'bg-[#9CC0ED]/50' : ' hover:shadow-sm shadow-[#9CC0ED]'
-            } ${isCurrentPage ? 'cursor-default' : ''}`
+            const classes = `px-4 py-2 text-sm font-semibold text-neutral-900 rounded-full ${isHighlighted ? 'bg-[#9CC0ED]/50' : ' hover:shadow-sm shadow-[#9CC0ED]'
+              } ${isCurrentPage ? 'cursor-default' : ''}`
 
             return isCurrentPage ? (
               <span key={tab.id} aria-current="page" className={classes}>
@@ -43,16 +44,20 @@ function Header({ activeTo, items, activeKey }) {
       )}
 
       <div className="flex items-center gap-4">
-        <input
-          type="text"
-          placeholder="Search..."
-          className="bg-[#9CC0ED]/50 border border-[#9CC0ED] rounded-full px-4 py-2 text-sm text-neutral-900 placeholder-[#2061B1] w-100 outline-none hover:shadow-sm shadow-[#9CC0ED] focus:shadow"
-        />
-        <Link to={onAuthPage ? '/' : '/login'} className="w-10 h-10 rounded-full bg-[#9CC0ED]/50 border border-[#9CC0ED] flex items-center justify-center cursor-pointer hover:shadow-sm shadow-[#9CC0ED]">
-          <span className="material-symbols-outlined text-black text-2xl -translate-x-0.5">Login</span>
+        <div className="flex items-center justify-center rounded-full text-sm text-neutral-900 shadow-sm focus-within:bg-[#9CC0ED]/50 backdrop-blur-xl">
+          <span class="material-symbols-outlined text-[#9CC0ED] ml-2 my-2">search</span>
+          <input
+            type="text"
+            placeholder="Search"
+            className="w-50 h-10 outline-none placeholder-[#9CC0ED]"
+          />
+        </div>
+        <Link to={onAuthPage ? '/' : '/login'} className="w-10 h-10 rounded-full flex items-center justify-center cursor-pointer shadow-sm focus-within:border border-[#9CC0ED] hover:bg-[#9CC0ED]/50 backdrop-blur-xl">
+          <span class="material-symbols-outlined text-[#9CC0ED] text-2xl -translate-x-0.5">Login</span>
+          
         </Link>
       </div>
-      
+
       {items && <PlatformStrip items={items} activeKey={activeKey} />}
     </header>
   )

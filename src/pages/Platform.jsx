@@ -1,6 +1,5 @@
 import { useParams } from 'react-router-dom'
 import Header from '../components/dashboard/Header'
-import PlatformStrip from '../components/dashboard/PlatformStrip'
 import { dashboardData } from '../data/dashboardData'
 import LinkPlatform from './LinkPlatform'
 
@@ -17,9 +16,8 @@ function Platform() {
 
   return (
     <div className="min-h-screen bg-[#FCF2E9] text-neutral-900">
-      <Header activeTo={group?.tabTo} />
+      <Header activeTo={group?.tabTo} items={group?.items} activeKey={name} />
 
-      {group && <PlatformStrip items={group.items} activeKey={name} />}
 
       {name === 'connect' ? (
         <LinkPlatform />
