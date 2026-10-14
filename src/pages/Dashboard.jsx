@@ -8,7 +8,7 @@ import { dashboardData } from '../data/dashboardData'
 
 function Dashboard() {
   return (
-    <div className="min-h-screen bg-[#FCF2E9] text-neutral-100">
+    <div className="min-h-screen bg-[#FCF2E9] text-neutral-100 ">
       <Header />
 
       <div className="flex flex-wrap gap-4 px-8 py-4">

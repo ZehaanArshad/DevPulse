@@ -8,7 +8,7 @@ function Header() {
   const onAuthPage = pathname === '/login' || pathname === '/signup'
 
   return (
-    <header className="flex items-center justify-between px-8 py-4 border-b border-neutral-800 flex-wrap">
+    <header className="flex items-center justify-between px-8 py-4 border border-[#9CC0ED] flex-wrap">
       <a href="/" className="flex items-center gap-3 cursor-pointer">
         {/* TODO: apna logo yahan daalo */}
         <img src={logo} alt="Dev Pulse logo" className="w-25 h-10 rounded-lg object-cover" />
