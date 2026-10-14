@@ -6,8 +6,8 @@ from models import User, Profile
 from schemas import UserCreate, ProfileCreate
 from platforms import fetch_codeforces, fetch_leetcode
 from sqlalchemy import func
-from schemas import UserCreate, UserOut
-from auth import hash_password
+from schemas import UserCreate, UserOut, UserLogin, TokenOut
+from auth import hash_password, verify_password, create_access_token
 
 app = FastAPI()
 
@@ -50,6 +50,22 @@ def signup(user: UserCreate, db: Session = Depends(get_db)):
     db.refresh(new_user)
 
     return new_user
+
+
+@app.post("/login", response_model=TokenOut)
+def login(creds: UserLogin, db: Session = Depends(get_db)):
+
+    user = db.query(User).filter_by(username=creds.username).first()
+
+    if (
+        not user
+        or not user.hashed_password
+        or not verify_password(creds.password, user.hashed_password)
+    ):
+        raise HTTPException(status_code=401, detail="Invalid username or password")
+
+    token = create_access_token(user.id)
+    return TokenOut(access_token=token)
 
 
 @app.get("/users/{user_id}/profiles")
