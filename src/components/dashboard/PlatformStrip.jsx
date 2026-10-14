@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 function PlatformStrip({ items, activeKey }) {
 
   return (
-    <div className="flex items-center justify-center flex-wrap gap-4 shadow-sm p-2 rounded-full backdrop-blur-xl w-fit mx-auto my-5">
+    <div className="flex items-center justify-center flex-wrap gap-4 shadow-sm p-2 rounded-full backdrop-blur-xl w-fit mx-auto my-5 font-serif">
 
       {items.map((item) => {
         const cardInner = (

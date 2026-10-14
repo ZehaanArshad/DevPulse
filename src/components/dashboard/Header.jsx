@@ -14,7 +14,7 @@ function Header({ activeTo, items, activeKey }) {
   const onAuthPage = pathname === '/login' || pathname === '/signup'
 
   return (
-    <header className="flex items-center justify-between px-8 py-4 flex-wrap ">
+    <header className="flex items-center justify-between px-8 py-4 flex-wrap font-serif">
       <a href="/" className="flex items-center gap-3 cursor-pointer">
         <img src={logo} alt="Dev Pulse logo" className="w-25 h-10 rounded-lg object-cover" />
         <span className="text-xl font-extrabold uppercase tracking-widest text-[#8A1919] cursor-pointer">Dev Pulse</span>

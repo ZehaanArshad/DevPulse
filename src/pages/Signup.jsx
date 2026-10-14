@@ -94,7 +94,7 @@ function Login() {
 
             <p className="mt-3 text-center text-xs text-neutral-900">
               Already have an account ?{' '}
-              <Link to="/login" className="font-bold hover:underline">
+              <Link to="/login" className="font-bold hover:underline hover:text-[#2877D7]">
                 Login
               </Link>
             </p>

@@ -31,7 +31,7 @@ function ContributionHeatmap({ heatmap }) {
           </span>
         </div>
         <button className="bg-[#9CC0ED]/50 border border-[#9CC0ED] rounded-lg px-3 py-1.5 text-sm text-neutral-900">
-          Current ▾
+          Last Year
         </button>
       </div>
 

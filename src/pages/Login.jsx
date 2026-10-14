@@ -82,7 +82,7 @@ function Login() {
 
             <p className="mt-6 text-center text-xs text-neutral-900">
               Don't have an account ?{' '}
-              <Link to="/signup" className="font-bold hover:underline">
+              <Link to="/signup" className="font-bold hover:underline hover:text-[#2877D7]">
                 Register for free
               </Link>
             </p>
