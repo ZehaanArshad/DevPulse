@@ -35,14 +35,14 @@ function Login() {
               <input
                 type="email"
                 placeholder="username@gmail.com"
-                className="rounded-md bg-white px-3 py-2.5 text-sm text-neutral-900 outline-none hover:border border-[#000000]/70"
+                className="rounded-md bg-white px-3 py-2.5 text-sm text-neutral-900 outline-none hover:border border-[#000000]/70 focus:border"
               />
 
               <label className="text-sm text-neutral-900">Password</label>
               <input
                 type="password"
                 placeholder="Password"
-                className="rounded-md bg-white px-3 py-2.5 text-sm text-neutral-900 outline-none hover:border border-[#000000]/70"
+                className="rounded-md bg-white px-3 py-2.5 text-sm text-neutral-900 outline-none hover:border border-[#000000]/70 focus:border"
               />
 
               <a href="#" className="text-sm hover:underline text-neutral-900">
@@ -53,7 +53,7 @@ function Login() {
                 type="submit"
                 className="mt-4 rounded-md bg-[#2877D7] py-2.5 font-semibold text-white hover:opacity-90 hover:border border-[#000000]/70"
               >
-                Sign in
+                Sign In
               </button>
             </form>
 

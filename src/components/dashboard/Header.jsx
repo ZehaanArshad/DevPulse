@@ -21,7 +21,7 @@ function Header() {
         <input
           type="text"
           placeholder="Search..."
-          className="bg-[#9CC0ED]/50 border border-[#9CC0ED] rounded-full px-4 py-2 text-sm text-neutral-900 placeholder-[#2061B1] w-100 outline-none hover:shadow-sm shadow-[#9CC0ED]"
+          className="bg-[#9CC0ED]/50 border border-[#9CC0ED] rounded-full px-4 py-2 text-sm text-neutral-900 placeholder-[#2061B1] w-100 outline-none hover:shadow-sm shadow-[#9CC0ED] focus:shadow"
         />
         {/* TODO: apna profile icon yahan daalo */}
         <Link to={onAuthPage ? '/' : '/login'}  className="w-10 h-10 rounded-full bg-[#9CC0ED]/50 border border-[#9CC0ED] flex items-center justify-center cursor-pointer hover:shadow-sm shadow-[#9CC0ED]">
