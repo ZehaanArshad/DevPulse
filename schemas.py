@@ -5,7 +5,7 @@ from pydantic import BaseModel, Field
 
 class UserCreate(BaseModel):
     username: str
-    password: str
+    password: str = Field(min_length=8, max_length=64)
 
 
 class ProfileCreate(BaseModel):
@@ -15,7 +15,7 @@ class ProfileCreate(BaseModel):
 
 class UserLogin(BaseModel):
     username: str
-    password: str = Field(min_length=8, max_length=64)
+    password: str
 
 
 class UserOut(BaseModel):
