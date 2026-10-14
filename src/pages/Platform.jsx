@@ -1,22 +1,28 @@
-import { Link, useParams } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import Header from '../components/dashboard/Header'
-import PlatformDropdown from '../components/dashboard/PlatformDropdown'
+import PlatformStrip from '../components/dashboard/PlatformStrip'
 import { dashboardData } from '../data/dashboardData'
+
+const groups = [
+  { id: 'problem-solving', tabTo: '/', items: dashboardData.problemPlatforms },
+  { id: 'development', tabTo: '/platform/github', items: dashboardData.devPlatforms },
+  { id: 'connect', tabTo: '/platform/connect', items: dashboardData.connectLinks },
+]
 
 function Platform() {
   const { name } = useParams()
+    const group = groups.find((g) => g.id === name || g.items.some((item) => item.key === name))
 
   return (
     <div className="min-h-screen bg-[#FCF2E9] text-neutral-900">
-      <Header />
-      <div className="flex flex-wrap gap-4 px-8 py-4">
-        <PlatformDropdown title="Problem Solving Stats" to="/" items={dashboardData.problemPlatforms} />
-        <PlatformDropdown title="Development Stats" to="/section/development" items={dashboardData.devPlatforms} />
-        <PlatformDropdown title="Connect with me" items={dashboardData.connectLinks} />
-      </div>
+      <Header activeTo={group?.tabTo} />
 
-      <h1 className="text-3xl font-bold mt-4 capitalize">{name}</h1>
-      <p className="mt-2">Is platform ke stats yahan aayenge.</p>
+      {group && <PlatformStrip items={group.items} activeKey={name} />}
+
+      <div className="px-8 py-4">
+        <h1 className="text-3xl font-bold capitalize">{name}</h1>
+        <p className="mt-2">Is platform ke stats yahan aayenge.</p>
+      </div>
     </div>
   )
 }

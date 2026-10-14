@@ -1,28 +1,24 @@
-import { Link, useParams } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import Header from '../components/dashboard/Header'
-import PlatformDropdown from '../components/dashboard/PlatformDropdown'
+import PlatformStrip from '../components/dashboard/PlatformStrip'
 import { dashboardData } from '../data/dashboardData'
 
-const titles = {
-  'problem-solving': 'Problem Solving Stats',
-  development: 'Development Stats',
-  connect: 'Connect with me',
+const sections = {
+  development: { title: 'Development Stats', items: dashboardData.devPlatforms },
+  connect: { title: 'Connect with me', items: dashboardData.connectLinks },
 }
 
 function Section() {
   const { name } = useParams()
+  const section = sections[name]
 
   return (
     <div className="min-h-screen bg-[#FCF2E9] text-neutral-900">
       <Header />
-      <div className="flex flex-wrap gap-4 px-8 py-4">
-        <PlatformDropdown title="Problem Solving Stats" to="/" items={dashboardData.problemPlatforms} />
-        <PlatformDropdown title="Development Stats" to="/section/development" items={dashboardData.devPlatforms} />
-        <PlatformDropdown title="Connect with me" items={dashboardData.connectLinks} />
-      </div>
 
-      <h1 className="text-3xl font-bold mt-4">{titles[name] ?? 'Not found'}</h1>
-      <p className="mt-2">Is section ka content yahan aayega.</p>
+      <h1 className="text-3xl font-bold px-8 pt-6">{section ? section.title : 'Not found'}</h1>
+
+      {section && <PlatformStrip items={section.items} />}
     </div>
   )
 }

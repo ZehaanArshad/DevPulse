@@ -8,9 +8,9 @@ function DifficultyDonut({ difficulty }) {
     #EAB308 ${easyPct}% ${easyPct + mediumPct}%,
     #EF4444 ${easyPct + mediumPct}% 100%
   )`
-
+                // backdrop-blur-xl
   return (
-    <div className="backdrop-blur-xl bg-[#9CC0ED]/50 bg-[#9CC0ED]/50 border border-[#9CC0ED] rounded-2xl p-5 hover:shadow-sm shadow-[#9CC0ED]">
+    <div className="  bg-[#9CC0ED]/50 border border-[#9CC0ED] rounded-2xl p-5 hover:shadow-sm shadow-[#9CC0ED]">
       <h3 className="text-lg font-bold text-neutral-900">Problems Distribution</h3>
       <p className="text-sm text-neutral-400 mb-4">DSA — Based on Difficulty</p>
 

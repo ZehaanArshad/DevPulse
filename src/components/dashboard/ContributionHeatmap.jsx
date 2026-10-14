@@ -47,7 +47,7 @@ function ContributionHeatmap({ heatmap }) {
               >
               
                 <span
-                className="hidden group-hover:block absolute bottom-full -translate-x-1/3 z-10 whitespace-nowrap pointer-events-none rounded bg-[#9CC0ED]/50 px-1 py-1 text-xs text-black font-mono shadow-md shadow-[#9CC0ED] border border-[#9CC0ED] backdrop-blur-sm">
+                className="hidden group-hover:block absolute bottom-full -translate-x-1/3 z-10 whitespace-nowrap pointer-events-none rounded bg-[#9CC0ED]/50 px-1 py-1 text-xs text-black font-mono shadow-md shadow-[#9CC0ED] border border-[#9CC0ED]">
                   {cell.date}
                   </span>
                   </div>
