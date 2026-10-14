@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom'
 import { FcGoogle } from 'react-icons/fc'
 import { FaGithub, FaFacebook } from 'react-icons/fa'
 import logo from '../assets/logo.gif'
-import newimg from '../assets/new3.gif'
+import lineAnimation from '../assets/lineAnimation.gif'
 import loginimg from '../assets/logo.gif'
 
 
@@ -13,7 +13,7 @@ function Login() {
 
       <div className="flex-1 min-h-0 p-8">
         <div
-          // style={{ backgroundImage: `url(${newimg})` }}
+          style={{ backgroundImage: `url(${lineAnimation})` }}
           className="flex-1 min-h-0  w-full h-full bg-cover bg-center bg-no-repeat rounded-2xl flex items-center justify-center gap-5 bg-[#2877D7]/50"
         >
 

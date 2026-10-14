@@ -1,7 +1,7 @@
 import logo from '../../assets/logo.gif'
 import { Link, useLocation } from 'react-router-dom'
 import PlatformStrip from './PlatformStrip'
-import newimg from '../../assets/new3.gif'
+import lineAnimation from '../../assets/lineAnimation.gif'
 
 const tabs = [
   { id: 'problem-solving', title: 'Problem Solving Stats', to: '/' },
@@ -15,8 +15,8 @@ function Header({ activeTo, items, activeKey }) {
   const onAuthPage = pathname === '/login' || pathname === '/signup'
 
   return (
-    <header style={{ backgroundImage: `url(${newimg})` }}
-    className="flex items-center justify-between px-8 pt-2 pb-4 mb-4 flex-wrap font-sans hover:shadow-sm shadow-[#9CC0ED]">
+    <header style={{ backgroundImage: `url(${lineAnimation})` }}
+    className="flex items-center justify-between px-8 pt-2 pb-4 mb-4 flex-wrap font-sans">
       <a href="/" className="flex items-center gap-3 cursor-pointer">
         <img src={logo} alt="Dev Pulse logo" className="w-25 h-10 rounded-lg object-cover" />
         <span className="text-xl font-extrabold uppercase tracking-widest text-[#8A1919] cursor-pointer">Dev Pulse</span>
