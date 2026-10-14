@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 function PlatformStrip({ items, activeKey }) {
 
   return (
-    <div className="flex items-center justify-center flex-wrap gap-4 shadow-sm p-2 rounded-full backdrop-blur-xl w-fit mx-auto my-5">
+    <div className="flex items-center justify-center flex-wrap gap-4 shadow-sm p-1 rounded-full backdrop-blur-xl w-fit mx-auto my-5 font-sans">
 
       {items.map((item) => {
         const cardInner = (
@@ -22,11 +22,11 @@ function PlatformStrip({ items, activeKey }) {
           >
 
             {item.to ? (
-              <Link to={item.to} className="flex items-center gap-3 px-4 py-2">
+              <Link to={item.to} className="flex items-center gap-3 px-4 py-1">
                 {cardInner}
               </Link>
             ) : (
-              <a href={item.url} target="_blank" rel="noreferrer" className="flex items-center gap-3 px-4 py-2">
+              <a href={item.url} target="_blank" rel="noreferrer" className="flex items-center gap-3 px-4 py-1">
                 {cardInner}
               </a>
             )}
@@ -37,7 +37,7 @@ function PlatformStrip({ items, activeKey }) {
                 target="_blank"
                 rel="noreferrer"
                 aria-label={`Open ${item.label}`}
-                className="flex items-center px-3"
+                className="flex items-center px-4"
               >
                 <span className="material-symbols-outlined text-neutral-900 hover:text-[#9CC0ED]">open_in_new</span>
               </a>

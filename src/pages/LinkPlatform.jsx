@@ -1,14 +1,11 @@
-import { Link } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 
 function LinkPlatform() {
+  const { name } = useParams()
   return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-900 text-slate-100">
-      <div className="text-center">
-        <h1 className="text-3xl font-bold">Link a platform</h1>
-        <Link to="/" className="text-indigo-400 hover:underline">
-          Wapas Dashboard pe jao
-        </Link>
-      </div>
+    <div className="px-8 py-4">
+      <h1 className="text-3xl font-bold capitalize">{name}</h1>
+      <p className="mt-2">Is platform ke stats yahan aayenge.</p>
     </div>
   )
 }

@@ -72,7 +72,7 @@ export const dashboardData = {
     { key: 'leetcode', label: 'LeetCode', initials: 'https://assets.leetcode.com/static_assets/public/images/LeetCode_logo_rvs.png', color: 'bg-orange-500/0', connected: false, url: 'https://leetcode.com', to: '/platform/leetcode' },
     { key: 'codeforces', label: 'CodeForces', initials: 'https://cdn.iconscout.com/icon/free/png-256/code-forces-3521352-2944796.png', color: 'bg-neutral-700/0', connected: false, url: 'https://codeforces.com', to: '/platform/codeforces' },
     { key: 'atcoder', label: 'AtCoder', initials: 'https://img.atcoder.jp/logo/atcoder/logo_transparent.png', color: 'bg-neutral-900/0', connected: true, url: 'https://atcoder.jp', to: '/platform/atcoder' },
-    { key: 'gfg', label: 'GeeksForGeeks', initials: 'https://media.geeksforgeeks.org/gfg-gg-logo.svg', color: 'bg-green-600/0', connected: false, url: 'https://www.geeksforgeeks.org', to: '/platform/gfg' },
+    { key: 'geeksforgeeks', label: 'GeeksForGeeks', initials: 'https://media.geeksforgeeks.org/gfg-gg-logo.svg', color: 'bg-green-600/0', connected: false, url: 'https://www.geeksforgeeks.org', to: '/platform/geeksforgeeks' },
   ],
   devPlatforms: [
     { key: 'github', label: 'GitHub', initials: 'https://cdn-icons-png.flaticon.com/512/25/25231.png', color: 'bg-neutral-900/0', connected: true, url: 'https://github.com', to: '/platform/github' },
