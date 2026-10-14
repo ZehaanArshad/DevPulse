@@ -8,7 +8,7 @@ function Header() {
   const onAuthPage = pathname === '/login' || pathname === '/signup'
 
   return (
-    <header className="flex items-center justify-between px-8 py-4 border border-[#9CC0ED] flex-wrap">
+    <header className="flex items-center justify-between px-8 py-4 border-b border-[#9CC0ED] flex-wrap ">
       <a href="/" className="flex items-center gap-3 cursor-pointer">
         {/* TODO: apna logo yahan daalo */}
         <img src={logo} alt="Dev Pulse logo" className="w-25 h-10 rounded-lg object-cover" />
@@ -21,10 +21,10 @@ function Header() {
         <input
           type="text"
           placeholder="Search..."
-          className="bg-[#9CC0ED]/50 border border-[#9CC0ED] rounded-full px-4 py-2 text-sm text-neutral-900 placeholder-[#2061B1] w-100 outline-none"
+          className="bg-[#9CC0ED]/50 border border-[#9CC0ED] rounded-full px-4 py-2 text-sm text-neutral-900 placeholder-[#2061B1] w-100 outline-none hover:shadow-sm shadow-[#9CC0ED]"
         />
         {/* TODO: apna profile icon yahan daalo */}
-        <Link to={onAuthPage ? '/' : '/login'}  className="w-10 h-10 rounded-full bg-[#9CC0ED] flex items-center justify-center cursor-pointer">
+        <Link to={onAuthPage ? '/' : '/login'}  className="w-10 h-10 rounded-full bg-[#9CC0ED]/50 border border-[#9CC0ED] flex items-center justify-center cursor-pointer hover:shadow-sm shadow-[#9CC0ED]">
             <span className="material-symbols-outlined text-black text-2xl -translate-x-0.5">Login</span>
             </Link>
             

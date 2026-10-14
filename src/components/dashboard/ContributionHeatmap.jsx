@@ -17,7 +17,7 @@ function ContributionHeatmap({ heatmap }) {
 // weeks[0]  -> week[0].date -> '2026-03-15' -> 03
 
   return (
-    <div className="min-w-0 backdrop-blur-xl bg-[#9CC0ED]/50 border border-[#9CC0ED] rounded-2xl p-5">
+    <div className="min-w-0 backdrop-blur-xl bg-[#9CC0ED]/50 border border-[#9CC0ED] rounded-2xl p-5 hover:shadow-sm shadow-[#9CC0ED]">
       <div className="flex items-center justify-between mb-4">
         <div className="flex gap-6 text-sm text-neutral-900">
           <span>
@@ -47,7 +47,7 @@ function ContributionHeatmap({ heatmap }) {
               >
               
                 <span
-                className="hidden group-hover:block absolute bottom-full -translate-x-1/3 z-10 whitespace-nowrap pointer-events-none rounded bg-[#9CC0ED] px-1 py-1 text-xs text-black font-mono">
+                className="hidden group-hover:block absolute bottom-full -translate-x-1/3 z-10 whitespace-nowrap pointer-events-none rounded bg-[#9CC0ED]/50 px-1 py-1 text-xs text-black font-mono shadow-md shadow-[#9CC0ED] border border-[#9CC0ED] backdrop-blur-sm">
                   {cell.date}
                   </span>
                   </div>

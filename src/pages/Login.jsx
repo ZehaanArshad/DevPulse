@@ -25,7 +25,9 @@ function Login() {
 
 
           <div className="w-full max-w-md rounded-2xl p-10 text-white backdrop-blur-3xl shadow-xl border border-[#9CC0ED]">
-            <img src={logo} alt="DevPulse logo" className=" h-40 w-95 object-cover rounded-2xl" />
+            <Link to="/" className="font-bold hover:underline hover:text-[#2877D7] flex items-center justify-center">
+              <img src={logo} alt="DevPulse logo" className=" h-40 w-95 object-cover rounded-2xl hover:border border-[#ffff]" />
+            </Link>
             <h2 className="mt-6 text-3xl font-semibold text-center font-serif text-neutral-900">Welcome Back</h2>
 
             <form className="mt-4 flex flex-col gap-3">
@@ -33,52 +35,52 @@ function Login() {
               <input
                 type="email"
                 placeholder="username@gmail.com"
-                className="rounded-md bg-white px-3 py-2.5 text-sm text-neutral-900 outline-none"
+                className="rounded-md bg-white px-3 py-2.5 text-sm text-neutral-900 outline-none hover:border border-[#000000]/70"
               />
 
-              <label className="text-sm">Password</label>
+              <label className="text-sm text-neutral-900">Password</label>
               <input
                 type="password"
                 placeholder="Password"
-                className="rounded-md bg-white px-3 py-2.5 text-sm text-neutral-900 outline-none"
+                className="rounded-md bg-white px-3 py-2.5 text-sm text-neutral-900 outline-none hover:border border-[#000000]/70"
               />
 
-              <a href="#" className="text-sm hover:underline">
+              <a href="#" className="text-sm hover:underline text-neutral-900">
                 Forgot Password ?
               </a>
 
               <button
                 type="submit"
-                className="mt-4 rounded-md bg-[#2877D7] py-2.5 font-semibold text-white hover:opacity-90"
+                className="mt-4 rounded-md bg-[#2877D7] py-2.5 font-semibold text-white hover:opacity-90 hover:border border-[#000000]/70"
               >
                 Sign in
               </button>
             </form>
 
-            <p className="mt-6 text-center text-sm">or continue with</p>
+            <p className="mt-6 text-center text-sm text-neutral-900">or continue with</p>
 
             <div className="mt-4 flex gap-3">
               <button
                 type="button"
-                className="flex flex-1 items-center justify-center rounded-md bg-white py-2.5 hover:opacity-90"
+                className="flex flex-1 items-center justify-center rounded-md bg-white py-2.5 hover:opacity-90 hover:border border-[#000000]/70"
               >
                 <FcGoogle size={22} />
               </button>
               <button
                 type="button"
-                className="flex flex-1 items-center justify-center rounded-md bg-white py-2.5 hover:opacity-90"
+                className="flex flex-1 items-center justify-center rounded-md bg-white py-2.5 hover:opacity-90 hover:border border-[#000000]/70"
               >
                 <FaGithub size={22} className="text-black" />
               </button>
               <button
                 type="button"
-                className="flex flex-1 items-center justify-center rounded-md bg-white py-2.5 hover:opacity-90"
+                className="flex flex-1 items-center justify-center rounded-md bg-white py-2.5 hover:opacity-90 hover:border border-[#000000]/70"
               >
                 <FaFacebook size={22} className="text-[#1877F2]" />
               </button>
             </div>
 
-            <p className="mt-6 text-center text-xs">
+            <p className="mt-6 text-center text-xs text-neutral-900">
               Don't have an account ?{' '}
               <Link to="/signup" className="font-bold hover:underline">
                 Register for free
