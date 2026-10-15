@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi import Depends, HTTPException
 from sqlalchemy.orm import Session
 from database import get_db
@@ -19,7 +19,7 @@ from fastapi.middleware.cors import CORSMiddleware
 import secrets
 from urllib.parse import urlencode
 from fastapi.responses import RedirectResponse
-from auth import GITHUB_CLIENT_ID
+from auth import GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET
 
 app = FastAPI()
 
@@ -29,6 +29,7 @@ app.add_middleware(
     allow_methods=["GET", "POST", "DELETE"],
     allow_headers=["Authorization", "Content-Type"],
 )
+import httpx
 
 
 @app.get("/")
@@ -200,3 +201,12 @@ def github_login():
     )
 
     return response
+
+
+@app.get("/auth/github/callback")
+def github_callback(request: Request, code: str, state: str):
+
+    cookie_state = request.cookies.get("oauth_state")
+
+    if not cookie_state:
+        raise HTTPException(status_code=400, detail="Invalid Oauth state")
