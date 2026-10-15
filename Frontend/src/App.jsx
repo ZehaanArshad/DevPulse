@@ -19,7 +19,14 @@ function App() {
         }
       />
       {/* <Route path="/" element={<Dashboard />} /> */}
-      <Route path="/platform/:name" element={<Platform />} />
+      <Route
+      path="/platform/:name"
+      element={
+      <ProtectedRoute>
+        <Platform />
+        </ProtectedRoute>
+      }
+      />
       
 
 

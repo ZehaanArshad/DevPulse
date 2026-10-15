@@ -1,7 +1,7 @@
 function DifficultyDonut({ difficulty }) {
   const { total, easy, medium, hard } = difficulty
-  const easyPct = (easy / total) * 100
-  const mediumPct = (medium / total) * 100
+  const easyPct = total ? (easy / total) * 100 : 0
+  const mediumPct = total ? (medium / total) * 100 : 0
 
   const gradient = `conic-gradient(
     #22C55E 0% ${easyPct}%,
