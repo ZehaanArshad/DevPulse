@@ -23,21 +23,6 @@ def read_root():
     return {"message": "DevPulse is alive"}
 
 
-@app.get("/users")
-def get_users(db: Session = Depends(get_db)):
-    return db.query(User).all()
-
-
-@app.get("/users/{user_id}")
-def get_user(user_id: int, db: Session = Depends(get_db)):
-    user = db.query(User).filter_by(id=user_id).first()
-
-    if not user:
-        raise HTTPException(status_code=404, detail=f"User with {user_id} not found.")
-
-    return user
-
-
 @app.post("/signup", response_model=UserOut, status_code=201)
 def signup(user: UserCreate, db: Session = Depends(get_db)):
     existing_user = db.query(User.username).filter_by(username=user.username).first()
