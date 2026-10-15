@@ -1,5 +1,6 @@
 import logo from '../../assets/logo.gif'
-import { Link, useLocation } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { isLoggedIn, clearToken } from '../../api/auth'
 import PlatformStrip from './PlatformStrip'
 import lineAnimation from '../../assets/lineAnimation.gif'
 
@@ -13,6 +14,11 @@ const tabs = [
 function Header({ activeTo, items, activeKey }) {
   const { pathname } = useLocation()
   const onAuthPage = pathname === '/login' || pathname === '/signup'
+  const navigate = useNavigate()
+  function handleLogout() {
+  clearToken()
+  navigate('/login')
+}
 
   return (
     <header 
@@ -53,10 +59,23 @@ function Header({ activeTo, items, activeKey }) {
             className="w-50 h-10 outline-none placeholder-[#9CC0ED]"
           />
         </div>
-        <Link to={onAuthPage ? '/' : '/login'} className="w-10 h-10 rounded-full flex items-center justify-center cursor-pointer shadow-sm focus-within:border border-[#9CC0ED] hover:bg-[#9CC0ED]/50 backdrop-blur-xl">
-          <span class="material-symbols-outlined text-[#9CC0ED] text-2xl -translate-x-0.5">Login</span>
-          
-        </Link>
+        {isLoggedIn() ? (
+  <button
+    type="button"
+    onClick={handleLogout}
+    title="Logout"
+    className="w-10 h-10 rounded-full flex items-center justify-center cursor-pointer shadow-sm hover:bg-[#8A1919]/50 backdrop-blur-xl"
+  >
+    <span className="material-symbols-outlined text-[#8A1919] text-2xl">logout</span>
+  </button>
+) : (
+  <Link
+    to={onAuthPage ? '/' : '/login'}
+    className="w-10 h-10 rounded-full flex items-center justify-center cursor-pointer shadow-sm hover:bg-[#9CC0ED]/50 backdrop-blur-xl"
+  >
+    <span className="material-symbols-outlined text-[#9CC0ED] text-2xl">login</span>
+  </Link>
+)}
       </div>
 
       {items && <PlatformStrip items={items} activeKey={activeKey} />}

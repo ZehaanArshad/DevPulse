@@ -12,7 +12,7 @@ profiles (Codeforces, LeetCode) into one place.
 3. Create a `.env` file in the project root:
 
    ```
-   DATABASE_URL=postgresql+psycopg://<user>@localhost/devpulse
+   DATABASE_URL=postgresql+psycopg://<user>:<password>@localhost/devpulse
    SECRET_KEY=<long random string>
    ```
 
