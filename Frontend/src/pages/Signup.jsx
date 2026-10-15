@@ -13,7 +13,7 @@ function Login() {
 
       <div className="flex-1 min-h-0 p-8">
         <div
-          style={{ backgroundImage: `url(${lineAnimation})` }}
+          // style={{ backgroundImage: `url(${lineAnimation})` }}
           className="flex-1 min-h-0  w-full h-full bg-cover bg-center bg-no-repeat rounded-2xl flex items-center justify-center gap-5 bg-[#2877D7]/50"
         >
 
