@@ -4,7 +4,6 @@ import Signup from './pages/Signup'
 import Dashboard from './pages/Dashboard'
 import LinkPlatform from './pages/LinkPlatform'
 import Platform from './pages/Platform'
-import Section from './pages/Section'
 import ProtectedRoute from './components/ProtectedRoute'
 
 
@@ -21,7 +20,7 @@ function App() {
       /> */}
       <Route path="/" element={<Dashboard />} />
       <Route path="/platform/:name" element={<Platform />} />
-      <Route path="/section/:name" element={<Section />} />
+      
 
 
       <Route path="/link-platform" element={<LinkPlatform />} />

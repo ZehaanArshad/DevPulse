@@ -1,19 +1,42 @@
-function generateHeatmapCells(weeks = 52) { // Function banaya, jo 'weeks' leta hai. Agar kuch pass nahi kiya to default 26 weeks
-  const cells = []   // Khaali array, isme saari cells ki intensity jama hogi
-  for (let i = 0; i < weeks * 7; i++) {
-     // Loop 0 se shuru hoke (weeks * 7) se pehle tak chalega
-  // 52 weeks hain to 52 * 7 = 364 baar chalega (i = 0 se 181)
-  // Matlab har din ke liye ek cell
-    const rand = Math.random()    // 0 se 1 ke beech ka random decimal number (jaise 0.37, 0.91)
-    let intensity = 0         // 'let' isliye kyunki ise neeche badalna hai
+function formatDate(d) {
+  // Local date ko 'YYYY-MM-DD' string banata hai (toISOString avoid kiya, UTC ki wajah se)
+  const month = String(d.getMonth() + 1).padStart(2, '0')
+  const day = String(d.getDate()).padStart(2, '0')
+  return `${d.getFullYear()}-${month}-${day}`
+}
+
+
+function generateHeatmapCells(weeks = 52) {
+  const cells = []
+  const today = new Date()
+
+  // weeks * 7 din peeche jao, phir us hafte ke Sunday tak aur peeche (getDay() = 0 for Sunday)
+  const start = new Date(today)
+  start.setFullYear(today.getFullYear() -  1)
+  // start.setDate(today.getDate() - (weeks * 7 - 1))
+  // start.setDate(start.getDate() - start.getDay())
+
+  // start se aaj tak, ek-ek din aage badho
+  for (let d = new Date(start); d <= today; d.setDate(d.getDate() + 1)) {
+    const rand = Math.random()
+    let intensity = 0
     if (rand > 0.85) intensity = 4
     else if (rand > 0.65) intensity = 3
     else if (rand > 0.45) intensity = 2
     else if (rand > 0.25) intensity = 1
-    cells.push(intensity)   // Is din ki intensity ki value ko array ke end mein daal diya
+    cells.push({ date: formatDate(d), intensity })
   }
   return cells
 }
+
+// Output ka example
+// cells = [
+//   { date: '2025-10-12', intensity: 0 },
+//   { date: '2025-10-13', intensity: 2 },
+//   { date: '2025-10-14', intensity: 4 },
+//   ...
+// ]
+
 
 export const dashboardData = {
   stats: {
@@ -21,7 +44,7 @@ export const dashboardData = {
     activeDays: 79,
   },
   heatmap: {
-    submissions: 364,
+    submissions: 395,
     maxStreak: 13,
     currentStreak: 1,
     months: ["January","February","March","April","May","June","July","August","September","October","November","December"],
@@ -49,7 +72,7 @@ export const dashboardData = {
     { key: 'leetcode', label: 'LeetCode', initials: 'https://assets.leetcode.com/static_assets/public/images/LeetCode_logo_rvs.png', color: 'bg-orange-500/0', connected: false, url: 'https://leetcode.com', to: '/platform/leetcode' },
     { key: 'codeforces', label: 'CodeForces', initials: 'https://cdn.iconscout.com/icon/free/png-256/code-forces-3521352-2944796.png', color: 'bg-neutral-700/0', connected: false, url: 'https://codeforces.com', to: '/platform/codeforces' },
     { key: 'atcoder', label: 'AtCoder', initials: 'https://img.atcoder.jp/logo/atcoder/logo_transparent.png', color: 'bg-neutral-900/0', connected: true, url: 'https://atcoder.jp', to: '/platform/atcoder' },
-    { key: 'gfg', label: 'GeeksForGeeks', initials: 'https://media.geeksforgeeks.org/gfg-gg-logo.svg', color: 'bg-green-600/0', connected: false, url: 'https://www.geeksforgeeks.org', to: '/platform/gfg' },
+    { key: 'geeksforgeeks', label: 'GeeksForGeeks', initials: 'https://media.geeksforgeeks.org/gfg-gg-logo.svg', color: 'bg-green-600/0', connected: false, url: 'https://www.geeksforgeeks.org', to: '/platform/geeksforgeeks' },
   ],
   devPlatforms: [
     { key: 'github', label: 'GitHub', initials: 'https://cdn-icons-png.flaticon.com/512/25/25231.png', color: 'bg-neutral-900/0', connected: true, url: 'https://github.com', to: '/platform/github' },
