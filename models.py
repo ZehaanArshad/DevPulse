@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, ForeignKey
+from sqlalchemy import Column, Integer, String, ForeignKey, BigInteger
 
 from database import Base
 from sqlalchemy.orm import relationship
@@ -13,6 +13,7 @@ class User(Base):
         "Profile", back_populates="user", cascade="all,delete-orphan"
     )
     hashed_password = Column(String, nullable=True)
+    github_id = Column(BigInteger, unique=True, nullable=True)
 
 
 class Profile(Base):
