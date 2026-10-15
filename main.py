@@ -87,16 +87,15 @@ def get_user_profiles(user: User = Depends(get_authorised_user)):
 
 @app.post("/users/{user_id}/profiles")
 def create_user_profile(
-    user_id: int, profile: ProfileCreate, db: Session = Depends(get_db)
+    profile: ProfileCreate,
+    user: User = Depends(get_authorised_user),
+    db: Session = Depends(get_db),
 ):
-    user = db.query(User).filter_by(id=user_id).first()
-    if not user:
-        raise HTTPException(status_code=404, detail=f"User with {user_id} not found.")
 
     existing = (
         db.query(Profile)
         .filter(
-            Profile.user_id == user_id,
+            Profile.user_id == user.id,
             Profile.platform == profile.platform,
             func.lower(Profile.handle) == profile.handle.lower(),
         )
@@ -110,7 +109,7 @@ def create_user_profile(
         )
 
     new_profile = Profile(
-        user_id=user_id, platform=profile.platform, handle=profile.handle
+        user_id=user.id, platform=profile.platform, handle=profile.handle
     )
 
     db.add(new_profile)
