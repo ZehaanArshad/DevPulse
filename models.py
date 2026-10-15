@@ -12,6 +12,7 @@ class User(Base):
     profiles = relationship(
         "Profile", back_populates="user", cascade="all,delete-orphan"
     )
+    hashed_password = Column(String, nullable=True)
 
 
 class Profile(Base):
