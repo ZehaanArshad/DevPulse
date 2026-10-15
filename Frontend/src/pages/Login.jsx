@@ -72,12 +72,7 @@ function Login() {
               >
                 <FaGithub size={22} className="text-black" />
               </button>
-              <button
-                type="button"
-                className="flex flex-1 items-center justify-center rounded-md bg-white py-2.5 hover:opacity-90 hover:border border-[#000000]/70"
-              >
-                <FaFacebook size={22} className="text-[#1877F2]" />
-              </button>
+              
             </div>
 
             <p className="mt-6 text-center text-xs text-neutral-900">
