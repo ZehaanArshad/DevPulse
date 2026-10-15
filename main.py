@@ -7,7 +7,7 @@ from schemas import UserCreate, ProfileCreate
 from platforms import fetch_codeforces, fetch_leetcode
 from sqlalchemy import func
 from schemas import UserCreate, UserOut, UserLogin, TokenOut
-from auth import hash_password, verify_password, create_access_token
+from auth import hash_password, verify_password, create_access_token, get_current_user
 
 app = FastAPI()
 
@@ -66,6 +66,11 @@ def login(creds: UserLogin, db: Session = Depends(get_db)):
 
     token = create_access_token(user.id)
     return TokenOut(access_token=token)
+
+
+@app.get("/me", response_model=UserOut)
+def me(current_user: User = Depends(get_current_user)):
+    return current_user
 
 
 @app.get("/users/{user_id}/profiles")
