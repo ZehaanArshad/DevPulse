@@ -7,7 +7,13 @@ from schemas import UserCreate, ProfileCreate
 from platforms import fetch_codeforces, fetch_leetcode
 from sqlalchemy import func
 from schemas import UserCreate, UserOut, UserLogin, TokenOut
-from auth import hash_password, verify_password, create_access_token, get_current_user
+from auth import (
+    hash_password,
+    verify_password,
+    create_access_token,
+    get_current_user,
+    get_authorised_user,
+)
 
 app = FastAPI()
 
@@ -74,11 +80,7 @@ def me(current_user: User = Depends(get_current_user)):
 
 
 @app.get("/users/{user_id}/profiles")
-def get_user_profiles(user_id: int, db: Session = Depends(get_db)):
-    user = db.query(User).filter_by(id=user_id).first()
-
-    if not user:
-        raise HTTPException(status_code=404, detail=f"User with {user_id} not found")
+def get_user_profiles(user: User = Depends(get_authorised_user)):
 
     return user.profiles
 
