@@ -136,11 +136,7 @@ def delete_user(
 
 
 @app.get("/users/{user_id}/stats")
-def get_user_stats(user_id: int, db: Session = Depends(get_db)):
-    user = db.query(User).filter_by(id=user_id).first()
-
-    if not user:
-        raise HTTPException(status_code=404, detail=f"User with {user_id} not found")
+def get_user_stats(user: User = Depends(get_authorised_user)):
 
     results = []
 
