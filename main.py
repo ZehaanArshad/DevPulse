@@ -120,11 +120,11 @@ def create_user_profile(
 
 
 @app.delete("/users/{user_id}", status_code=204)
-def delete_user(user_id: int, confirm: bool = False, db: Session = Depends(get_db)):
-    user = db.query(User).filter_by(id=user_id).first()
-
-    if not user:
-        raise HTTPException(status_code=404, detail=f"User with {user_id} not found.")
+def delete_user(
+    user: User = Depends(get_authorised_user),
+    confirm: bool = False,
+    db: Session = Depends(get_db),
+):
 
     if user.profiles and not confirm:
         raise HTTPException(
