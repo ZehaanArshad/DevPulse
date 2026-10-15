@@ -15,7 +15,8 @@ function Header({ activeTo, items, activeKey }) {
   const onAuthPage = pathname === '/login' || pathname === '/signup'
 
   return (
-    <header style={{ backgroundImage: `url(${lineAnimation})` }}
+    <header 
+    // style={{ backgroundImage: `url(${lineAnimation})` }}
     className="flex items-center justify-between px-8 pt-2 pb-4 mb-4 flex-wrap font-sans">
       <a href="/" className="flex items-center gap-3 cursor-pointer">
         <img src={logo} alt="Dev Pulse logo" className="w-25 h-10 rounded-lg object-cover" />
