@@ -14,6 +14,7 @@ class User(Base):
     )
     hashed_password = Column(String, nullable=True)
     github_id = Column(BigInteger, unique=True, nullable=True)
+    email = Column(String, nullable=True, unique=True, index=True)
 
 
 class Profile(Base):
