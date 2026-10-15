@@ -16,6 +16,11 @@ from auth import (
 )
 from fastapi.middleware.cors import CORSMiddleware
 
+import secrets
+from urllib.parse import urlencode
+from fastapi.responses import RedirectResponse
+from auth import GITHUB_CLIENT_ID
+
 app = FastAPI()
 
 app.add_middleware(
@@ -168,3 +173,30 @@ def get_user_stats(user: User = Depends(get_authorised_user)):
     }
 
     return {"username": user.username, "summary": summary, "profiles": results}
+
+
+@app.get("/auth/github/login")
+def github_login():
+
+    state = secrets.token_urlsafe(32)
+
+    params = {
+        "client_id": GITHUB_CLIENT_ID,
+        "redirect_uri": "http://localhost:8000/auth/github/callback",
+        "scope": "read:user",
+        "state": state,
+    }
+
+    url = "https://github.com/login/oauth/authorize?" + urlencode(params)
+
+    response = RedirectResponse(url)
+
+    response.set_cookie(
+        key="oauth_state",
+        value=state,
+        httponly=True,
+        max_age=300,
+        samesite="lax",
+    )
+
+    return response

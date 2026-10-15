@@ -17,6 +17,8 @@ bearer_scheme = HTTPBearer()
 load_dotenv()
 
 SECRET_KEY = os.getenv("SECRET_KEY")
+GITHUB_CLIENT_ID = os.getenv("GITHUB_CLIENT_ID")
+GITHUB_CLIENT_SECRET = os.getenv("GITHUB_CLIENT_SECRET")
 ALGORITHM = "HS256"
 TOKEN_EXPIRE_MINUTES = 60
 
