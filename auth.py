@@ -61,3 +61,13 @@ def get_current_user(
         raise HTTPException(status_code=401, detail="Invalid or expired token")
 
     return user
+
+
+def get_authorised_user(
+    user_id: int, current_user: User = Depends(get_current_user)
+) -> User:
+
+    if current_user.id != user_id:
+        raise HTTPException(status_code=403, detail="Not allowed to access this user")
+
+    return current_user
