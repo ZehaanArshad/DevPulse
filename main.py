@@ -112,6 +112,21 @@ def create_user_profile(
     return new_profile
 
 
+@app.delete("/users/{user_id}/profiles/{profile_id}", status_code=204)
+def delete_user_profile(
+    profile_id: int,
+    user: User = Depends(get_authorised_user),
+    db: Session = Depends(get_db),
+):
+    profile = db.get(Profile, profile_id)
+
+    if profile is None or profile.user_id != user.id:
+        raise HTTPException(status_code=404, detail="Profile not found")
+
+    db.delete(profile)
+    db.commit()
+
+
 @app.delete("/users/{user_id}", status_code=204)
 def delete_user(
     user: User = Depends(get_authorised_user),

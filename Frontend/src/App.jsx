@@ -11,15 +11,22 @@ function App() {
   return (
     <Routes>
       <Route
-        // path="/"
-        // element={
-        //   <ProtectedRoute>
-        //     <Dashboard />
-        //   </ProtectedRoute>
-        // }
+        path="/"
+        element={
+          <ProtectedRoute>
+            <Dashboard />
+          </ProtectedRoute>
+        }
       />
-      <Route path="/" element={<Dashboard />} />
-      <Route path="/platform/:name" element={<Platform />} />
+      {/* <Route path="/" element={<Dashboard />} /> */}
+      <Route
+      path="/platform/:name"
+      element={
+      <ProtectedRoute>
+        <Platform />
+        </ProtectedRoute>
+      }
+      />
       
 
 

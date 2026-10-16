@@ -43,7 +43,7 @@ function ContributionHeatmap({ heatmap }) {
             {week.map((cell) => (
               <div
               key={cell.date}
-              className={`group relative w-[14px] h-[14px] rounded-sm hover:border-1 border-black ${intensityColor[cell.intensity]}`}
+              className={`group relative w-[17px] h-[17px] rounded-sm hover:border-1 border-black ${intensityColor[cell.intensity]}`}
               >
               
                 <span

@@ -1,17 +1,24 @@
-let token = null
-
 export function setToken(newToken) {
-  token = newToken
+  localStorage.setItem('token', newToken)
 }
 
 export function getToken() {
-  return token
+  return localStorage.getItem('token')
+}
+
+export function setUserId(id) {
+  localStorage.setItem('userId', id)
+}
+
+export function getUserId() {
+  return localStorage.getItem('userId')
 }
 
 export function clearToken() {
-  token = null
+  localStorage.removeItem('token')
+  localStorage.removeItem('userId')
 }
 
 export function isLoggedIn() {
-  return token !== null
+  return getToken() !== null
 }

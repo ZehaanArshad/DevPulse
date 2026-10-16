@@ -1,4 +1,6 @@
-import { Link } from 'react-router-dom'
+import { useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
+import { login } from '../api/api'
 import { FcGoogle } from 'react-icons/fc'
 import { FaGithub, FaFacebook } from 'react-icons/fa'
 import logo from '../assets/logo.gif'
@@ -8,12 +10,37 @@ import loginimg from '../assets/logo.gif'
 
 
 function Login() {
+  const [userName, setUserName] = useState('')
+  const [password, setPassword] = useState('')
+  const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
+  const navigate = useNavigate()
+
+async function handleSubmit(e) {
+  e.preventDefault()
+  setError('')
+
+  if (!userName.trim() || !password) {
+    setError('Username aur password dono daalo')
+    return
+  }
+
+  try {
+    setLoading(true)
+    await login(userName, password)
+    navigate('/')
+  } catch (err) {
+    setError(err.message)
+  } finally {
+    setLoading(false)
+  }
+}
   return (
     <div className="h-screen flex flex-col bg-[#FCF2E9] font-serif">
 
       <div className="flex-1 min-h-0 p-8">
         <div
-          style={{ backgroundImage: `url(${lineAnimation})` }}
+          // style={{ backgroundImage: `url(${lineAnimation})` }}
           className="flex-1 min-h-0  w-full h-full bg-cover bg-center bg-no-repeat rounded-2xl flex items-center justify-center gap-5 bg-[#2877D7]/50"
         >
 
@@ -30,18 +57,30 @@ function Login() {
             </Link>
             <h2 className="mt-6 text-3xl font-semibold text-center font-serif text-neutral-900">Welcome Back</h2>
 
-            <form className="mt-4 flex flex-col gap-3">
-              <label className="text-sm text-neutral-900">Email</label>
+            <form onSubmit={handleSubmit} className="mt-4 flex flex-col gap-3">
+              <label className="text-sm text-neutral-900">UserName</label>
+              <input
+              type="text"
+              placeholder="UserName"
+              value={userName}
+              onChange={(e) => setUserName(e.target.value)}
+              className="rounded-md bg-white
+              px-3 py-1.5 text-sm text-neutral-900 outline-none hover:border border-[#000000]/70 focus:border"
+              />
+              
+              {/* <label className="text-sm text-neutral-900">Email</label>
               <input
                 type="email"
                 placeholder="username@gmail.com"
                 className="rounded-md bg-white px-3 py-2.5 text-sm text-neutral-900 outline-none hover:border border-[#000000]/70 focus:border"
-              />
+              /> */}
 
               <label className="text-sm text-neutral-900">Password</label>
               <input
                 type="password"
                 placeholder="Password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
                 className="rounded-md bg-white px-3 py-2.5 text-sm text-neutral-900 outline-none hover:border border-[#000000]/70 focus:border"
               />
 
@@ -49,12 +88,14 @@ function Login() {
                 Forgot Password ?
               </a>
 
+              {error && <p className="text-sm text-red-600">{error}</p>}
               <button
-                type="submit"
-                className="mt-4 rounded-md bg-[#2877D7] py-2.5 font-semibold text-white hover:opacity-90 hover:border border-[#000000]/70"
+              type="submit"
+              disabled={loading}
+              className="mt-4 rounded-md bg-[#2877D7] py-2.5 font-semibold text-white hover:opacity-90 hover:border border-[#000000]/70 disabled:opacity-50"
               >
-                Sign In
-              </button>
+                {loading ? 'Signing in...' : 'Sign In'}
+                </button>
             </form>
 
             <p className="mt-6 text-center text-sm text-neutral-900">or continue with</p>

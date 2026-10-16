@@ -2,6 +2,9 @@ import { useParams } from 'react-router-dom'
 import Header from '../components/dashboard/Header'
 import { dashboardData } from '../data/dashboardData'
 import LinkPlatform from './LinkPlatform'
+import LeetCodeStats from '../components/platform/LeetCodeStats'
+import CodeforcesStats from '../components/platform/CodeforcesStats'
+
 
 
 const groups = [
@@ -17,16 +20,21 @@ function Platform() {
   return (
     <div className="min-h-screen bg-[#FCF2E9] text-neutral-900">
       <Header activeTo={group?.tabTo} items={group?.items} activeKey={name} />
-
-
+      
+      
       {name === 'connect' ? (
         <LinkPlatform />
-      ) : (
-        <div className="px-8 py-4">
-          <h1 className="text-3xl font-bold capitalize">{name}</h1>
-          <p className="mt-2">Is platform ke stats yahan aayenge.</p>
-        </div>
-      )}
+      ) : name === 'leetcode' ? (
+      <LeetCodeStats />
+    ) : name === 'codeforces' ? (
+    <CodeforcesStats />
+  ) : (
+    <div className="px-8 py-4">
+      <h1 className="text-3xl font-bold capitalize">{name}</h1>
+      <p className="mt-2">Is platform ke stats yahan aayenge.</p>
+      </div>
+)}
+
 
     </div>
   )
