@@ -256,3 +256,28 @@ def google_login():
     )
 
     return response
+
+
+@app.get("/auth/google/callback")
+def google_callback(request: Request, code: str, state: str):
+
+    google_cookie = request.cookies.get("google_auth_state")
+
+    if not google_cookie or not secrets.compare_digest(google_cookie, state):
+        raise HTTPException(status_code=400, detail="Invalid Oauth State")
+
+    data = {
+        "code": code,
+        "client_id": GOOGLE_CLIENT_ID,
+        "client_secret": GOOGLE_CLIENT_SECRET,
+        "redirect_uri": "http://localhost:8000/auth/google/callback",
+        "grant_type": "authorization_code",
+    }
+
+    response = httpx.post("https://oauth2.googleapis.com/token", data=data)
+
+    if response.status_code != 200:
+        raise HTTPException(status_code=400, detail="Google token exchange failed")
+    tokens = response.json()
+
+    return tokens
