@@ -280,4 +280,30 @@ def google_callback(request: Request, code: str, state: str):
         raise HTTPException(status_code=400, detail="Google token exchange failed")
     tokens = response.json()
 
-    return tokens
+    access_token = tokens["access_token"]
+
+    userinfo_response = httpx.get(
+        "https://openidconnect.googleapis.com/v1/userinfo",
+        headers={"Authorization": f"Bearer {access_token}"},
+    )
+
+    if userinfo_response.status_code != 200:
+        raise HTTPException(
+            status_code=400, detail="Failed to fetch user info from Google"
+        )
+
+    user_info = userinfo_response.json()
+
+    sub = user_info.get("sub")
+    email = user_info.get("email")
+    email_verified = user_info.get("email_verified")
+
+    if not email_verified:
+        raise HTTPException(status_code=400, detail="Email not verified by Google")
+
+    email = email.strip().lower()
+
+    return {
+        "sub": sub,
+        "email": email,
+    }
