@@ -39,6 +39,9 @@ def read_root():
 
 @app.post("/signup", response_model=UserOut, status_code=201)
 def signup(user: UserCreate, db: Session = Depends(get_db)):
+
+    normalised_email = user.email.strip().lower()
+
     existing_user = db.query(User.username).filter_by(username=user.username).first()
 
     if existing_user:
@@ -46,8 +49,17 @@ def signup(user: UserCreate, db: Session = Depends(get_db)):
             status_code=409, detail=f"The user already exists,please sign in"
         )
 
+    existing_email = db.query(User.id).filter_by(email=normalised_email).first()
+
+    if existing_email:
+        raise HTTPException(
+            status_code=409, detail="The email already exists.Please sign in."
+        )
+
     new_user = User(
-        username=user.username, hashed_password=hash_password(user.password)
+        username=user.username,
+        hashed_password=hash_password(user.password),
+        email=normalised_email,
     )
 
     db.add(new_user)
@@ -60,14 +72,15 @@ def signup(user: UserCreate, db: Session = Depends(get_db)):
 @app.post("/login", response_model=TokenOut)
 def login(creds: UserLogin, db: Session = Depends(get_db)):
 
-    user = db.query(User).filter_by(username=creds.username).first()
+    normalised_email = creds.email.strip().lower()
+    user = db.query(User).filter_by(email=normalised_email).first()
 
     if (
         not user
         or not user.hashed_password
         or not verify_password(creds.password, user.hashed_password)
     ):
-        raise HTTPException(status_code=401, detail="Invalid username or password")
+        raise HTTPException(status_code=401, detail="Invalid email or password")
 
     token = create_access_token(user.id)
     return TokenOut(access_token=token)
