@@ -47,8 +47,9 @@ function LeetCodeStats() {
   }
 
   return (
+    // _1fr
     <>
-      <div className="flex gap-4 px-8">
+      <div className="grid grid-cols-[150px_320px] gap-4 px-8 pb-4">
         <div className="flex flex-col gap-4">
           <StatCard label="Questions Solved" value={data.all} />
           {/* <StatCard label="Active Days" value={dashboardData.stats.activeDays} /> */}
