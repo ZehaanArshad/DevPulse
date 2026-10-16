@@ -19,7 +19,12 @@ from fastapi.middleware.cors import CORSMiddleware
 import secrets
 from urllib.parse import urlencode
 from fastapi.responses import RedirectResponse
-from auth import GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET
+from auth import (
+    GITHUB_CLIENT_ID,
+    GITHUB_CLIENT_SECRET,
+    GOOGLE_CLIENT_ID,
+    GOOGLE_CLIENT_SECRET,
+)
 
 app = FastAPI()
 
@@ -223,3 +228,31 @@ def github_callback(request: Request, code: str, state: str):
 
     if not cookie_state:
         raise HTTPException(status_code=400, detail="Invalid Oauth state")
+
+
+@app.get("/auth/google/login")
+def google_login():
+
+    state = secrets.token_hex(16)
+
+    params = {
+        "client_id": GOOGLE_CLIENT_ID,
+        "redirect_uri": "http://localhost:8000/auth/google/callback",
+        "response_type": "code",
+        "scope": "openid email profile",
+        "state": state,
+    }
+
+    auth_url = f"https://accounts.google.com/o/oauth2/v2/auth?{urlencode(params)}"
+
+    response = RedirectResponse(url=auth_url, status_code=307)
+
+    response.set_cookie(
+        key="google_auth_state",
+        value=state,
+        httponly=True,
+        max_age=300,
+        samesite="lax",
+    )
+
+    return response
