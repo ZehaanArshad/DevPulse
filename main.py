@@ -307,30 +307,36 @@ def google_callback(
 
     user = db.query(User).filter_by(google_id=sub).first()
 
-    if user:
-        return {"user_id": user.id}
+    if not user:
+        user = db.query(User).filter_by(email=email).first()
+        if user:
+            user.google_id = sub
+            db.commit()
 
-    user = db.query(User).filter_by(email=email).first()
+    if not user:
 
-    if user:
-        user.google_id = sub
+        base_username = email.split("@")[0]
+        username = base_username
+        while db.query(User).filter_by(username=username).first():
+            username = f"{base_username}_{secrets.token_hex(2)}"
+
+        new_user = User(
+            username=username,
+            email=email,
+            google_id=sub,
+        )
+
+        db.add(new_user)
         db.commit()
-        return {"user_id": user.id}
+        db.refresh(new_user)
 
-    base_username = email.split("@")[0]
-    username = base_username
+        user = new_user
 
-    while db.query(User).filter_by(username=username).first():
-        username = f"{base_username}_{secrets.token_hex(2)}"
+    access_token = create_access_token(user.id)
 
-    new_user = User(
-        username=username,
-        email=email,
-        google_id=sub,
+    response = RedirectResponse(
+        url=f"http://localhost:5173/auth/callback#token={access_token}", status_code=307
     )
 
-    db.add(new_user)
-    db.commit()
-    db.refresh(new_user)
-
-    return {"user_id": new_user.id}
+    response.delete_cookie("google_auth_state")
+    return response
