@@ -259,7 +259,9 @@ def google_login():
 
 
 @app.get("/auth/google/callback")
-def google_callback(request: Request, code: str, state: str):
+def google_callback(
+    request: Request, code: str, state: str, db: Session = Depends(get_db)
+):
 
     google_cookie = request.cookies.get("google_auth_state")
 
@@ -303,7 +305,32 @@ def google_callback(request: Request, code: str, state: str):
 
     email = email.strip().lower()
 
-    return {
-        "sub": sub,
-        "email": email,
-    }
+    user = db.query(User).filter_by(google_id=sub).first()
+
+    if user:
+        return {"user_id": user.id}
+
+    user = db.query(User).filter_by(email=email).first()
+
+    if user:
+        user.google_id = sub
+        db.commit()
+        return {"user_id": user.id}
+
+    base_username = email.split("@")[0]
+    username = base_username
+
+    while db.query(User).filter_by(username=username).first():
+        username = f"{base_username}_{secrets.token_hex(2)}"
+
+    new_user = User(
+        username=username,
+        email=email,
+        google_id=sub,
+    )
+
+    db.add(new_user)
+    db.commit()
+    db.refresh(new_user)
+
+    return {"user_id": new_user.id}
