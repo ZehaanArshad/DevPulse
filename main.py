@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi import Depends, HTTPException
 from sqlalchemy.orm import Session
 from database import get_db
@@ -16,6 +16,16 @@ from auth import (
 )
 from fastapi.middleware.cors import CORSMiddleware
 
+import secrets
+from urllib.parse import urlencode
+from fastapi.responses import RedirectResponse
+from auth import (
+    GITHUB_CLIENT_ID,
+    GITHUB_CLIENT_SECRET,
+    GOOGLE_CLIENT_ID,
+    GOOGLE_CLIENT_SECRET,
+)
+
 app = FastAPI()
 
 app.add_middleware(
@@ -24,6 +34,7 @@ app.add_middleware(
     allow_methods=["GET", "POST", "DELETE"],
     allow_headers=["Authorization", "Content-Type"],
 )
+import httpx
 
 
 @app.get("/")
@@ -33,6 +44,9 @@ def read_root():
 
 @app.post("/signup", response_model=UserOut, status_code=201)
 def signup(user: UserCreate, db: Session = Depends(get_db)):
+
+    normalised_email = user.email.strip().lower()
+
     existing_user = db.query(User.username).filter_by(username=user.username).first()
 
     if existing_user:
@@ -40,8 +54,17 @@ def signup(user: UserCreate, db: Session = Depends(get_db)):
             status_code=409, detail=f"The user already exists,please sign in"
         )
 
+    existing_email = db.query(User.id).filter_by(email=normalised_email).first()
+
+    if existing_email:
+        raise HTTPException(
+            status_code=409, detail="The email already exists.Please sign in."
+        )
+
     new_user = User(
-        username=user.username, hashed_password=hash_password(user.password)
+        username=user.username,
+        hashed_password=hash_password(user.password),
+        email=normalised_email,
     )
 
     db.add(new_user)
@@ -54,14 +77,15 @@ def signup(user: UserCreate, db: Session = Depends(get_db)):
 @app.post("/login", response_model=TokenOut)
 def login(creds: UserLogin, db: Session = Depends(get_db)):
 
-    user = db.query(User).filter_by(username=creds.username).first()
+    normalised_email = creds.email.strip().lower()
+    user = db.query(User).filter_by(email=normalised_email).first()
 
     if (
         not user
         or not user.hashed_password
         or not verify_password(creds.password, user.hashed_password)
     ):
-        raise HTTPException(status_code=401, detail="Invalid username or password")
+        raise HTTPException(status_code=401, detail="Invalid email or password")
 
     token = create_access_token(user.id)
     return TokenOut(access_token=token)
@@ -183,3 +207,151 @@ def get_user_stats(user: User = Depends(get_authorised_user)):
     }
 
     return {"username": user.username, "summary": summary, "profiles": results}
+
+
+@app.get("/auth/github/login")
+def github_login():
+
+    state = secrets.token_urlsafe(32)
+
+    params = {
+        "client_id": GITHUB_CLIENT_ID,
+        "redirect_uri": "http://localhost:8000/auth/github/callback",
+        "scope": "read:user",
+        "state": state,
+    }
+
+    url = "https://github.com/login/oauth/authorize?" + urlencode(params)
+
+    response = RedirectResponse(url)
+
+    response.set_cookie(
+        key="oauth_state",
+        value=state,
+        httponly=True,
+        max_age=300,
+        samesite="lax",
+    )
+
+    return response
+
+
+@app.get("/auth/github/callback")
+def github_callback(request: Request, code: str, state: str):
+
+    cookie_state = request.cookies.get("oauth_state")
+
+    if not cookie_state:
+        raise HTTPException(status_code=400, detail="Invalid Oauth state")
+
+
+@app.get("/auth/google/login")
+def google_login():
+
+    state = secrets.token_hex(16)
+
+    params = {
+        "client_id": GOOGLE_CLIENT_ID,
+        "redirect_uri": "http://localhost:8000/auth/google/callback",
+        "response_type": "code",
+        "scope": "openid email profile",
+        "state": state,
+    }
+
+    auth_url = f"https://accounts.google.com/o/oauth2/v2/auth?{urlencode(params)}"
+
+    response = RedirectResponse(url=auth_url, status_code=307)
+
+    response.set_cookie(
+        key="google_auth_state",
+        value=state,
+        httponly=True,
+        max_age=300,
+        samesite="lax",
+    )
+
+    return response
+
+
+@app.get("/auth/google/callback")
+def google_callback(
+    request: Request, code: str, state: str, db: Session = Depends(get_db)
+):
+
+    google_cookie = request.cookies.get("google_auth_state")
+
+    if not google_cookie or not secrets.compare_digest(google_cookie, state):
+        raise HTTPException(status_code=400, detail="Invalid Oauth State")
+
+    data = {
+        "code": code,
+        "client_id": GOOGLE_CLIENT_ID,
+        "client_secret": GOOGLE_CLIENT_SECRET,
+        "redirect_uri": "http://localhost:8000/auth/google/callback",
+        "grant_type": "authorization_code",
+    }
+
+    response = httpx.post("https://oauth2.googleapis.com/token", data=data)
+
+    if response.status_code != 200:
+        raise HTTPException(status_code=400, detail="Google token exchange failed")
+    tokens = response.json()
+
+    access_token = tokens["access_token"]
+
+    userinfo_response = httpx.get(
+        "https://openidconnect.googleapis.com/v1/userinfo",
+        headers={"Authorization": f"Bearer {access_token}"},
+    )
+
+    if userinfo_response.status_code != 200:
+        raise HTTPException(
+            status_code=400, detail="Failed to fetch user info from Google"
+        )
+
+    user_info = userinfo_response.json()
+
+    sub = user_info.get("sub")
+    email = user_info.get("email")
+    email_verified = user_info.get("email_verified")
+
+    if not email_verified:
+        raise HTTPException(status_code=400, detail="Email not verified by Google")
+
+    email = email.strip().lower()
+
+    user = db.query(User).filter_by(google_id=sub).first()
+
+    if not user:
+        user = db.query(User).filter_by(email=email).first()
+        if user:
+            user.google_id = sub
+            db.commit()
+
+    if not user:
+
+        base_username = email.split("@")[0]
+        username = base_username
+        while db.query(User).filter_by(username=username).first():
+            username = f"{base_username}_{secrets.token_hex(2)}"
+
+        new_user = User(
+            username=username,
+            email=email,
+            google_id=sub,
+        )
+
+        db.add(new_user)
+        db.commit()
+        db.refresh(new_user)
+
+        user = new_user
+
+    access_token = create_access_token(user.id)
+
+    response = RedirectResponse(
+        url=f"http://localhost:5173/auth/callback#token={access_token}", status_code=307
+    )
+
+    response.delete_cookie("google_auth_state")
+    return response
