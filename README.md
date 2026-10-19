@@ -29,17 +29,35 @@ Interactive API docs are at http://127.0.0.1:8000/docs.
 
 ## Endpoints
 
-| Method | Path | Description |
-| --- | --- | --- |
-| POST | `/signup` | Register a new user (201, 409 if user exists) |
-| POST | `/login` | Authenticate user and return token (401 on bad credentials) |
-| GET | `/me` | Get current user info |
+| POST | `/signup` | Register with `username`, `email`, `password` (201; 409 if username or email exists) |
+| POST | `/login` | Log in with `email` and `password`, returns a JWT (401 on bad credentials) |
+| GET | `/me` | Get the current user (requires token) |
+| GET | `/auth/google/login` | Start Google sign-in (redirects to Google) |
+| GET | `/auth/google/callback` | Google returns here; redirects to the frontend with the JWT |
+| GET | `/auth/github/login` | Start GitHub sign-in (redirects to GitHub) |
+| GET | `/auth/github/callback` | GitHub returns here; redirects to the frontend with the JWT |
+
 | DELETE | `/users/{user_id}?confirm=true` | Delete a user and their profiles (409 without `confirm`) |
 | GET | `/users/{user_id}/profiles` | List a user's platform profiles |
 | POST | `/users/{user_id}/profiles` | Add a profile (`platform`: `codeforces` or `leetcode`, `handle`) |
 | GET | `/users/{user_id}/stats` | Fetch live stats for every profile of a user |
 
 *Note: `/me` and `/users/{user_id}/...` endpoints require `Authorization: Bearer <token>`. Missing/invalid token returns 401; accessing another user's `/users/{user_id}/...` routes returns 403.*
+
+## Social login flow
+
+1. The frontend sends the browser to `http://localhost:8000/auth/google/login`
+   or `/auth/github/login` (a full-page navigation, not `fetch`).
+2. The user approves on Google/GitHub, which returns to our callback route.
+3. The backend verifies the `state`, exchanges the code, requires a verified
+   email, then finds the user by provider id, links an existing account with
+   the same email, or creates a new one.
+4. The backend redirects to `http://localhost:5173/auth/callback#token=<JWT>`.
+   The frontend reads the token from the URL fragment and sends it as
+   `Authorization: Bearer <JWT>` on later requests.
+
+Accounts created through Google or GitHub have no password, so password
+login for them returns 401.
 
 ## Design notes
 
