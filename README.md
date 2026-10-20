@@ -29,6 +29,8 @@ Interactive API docs are at http://127.0.0.1:8000/docs.
 
 ## Endpoints
 
+| Method | Path | Description |
+| --- | --- | --- |
 | POST | `/signup` | Register with `username`, `email`, `password` (201; 409 if username or email exists) |
 | POST | `/login` | Log in with `email` and `password`, returns a JWT (401 on bad credentials) |
 | GET | `/me` | Get the current user (requires token) |
@@ -36,7 +38,6 @@ Interactive API docs are at http://127.0.0.1:8000/docs.
 | GET | `/auth/google/callback` | Google returns here; redirects to the frontend with the JWT |
 | GET | `/auth/github/login` | Start GitHub sign-in (redirects to GitHub) |
 | GET | `/auth/github/callback` | GitHub returns here; redirects to the frontend with the JWT |
-
 | DELETE | `/users/{user_id}?confirm=true` | Delete a user and their profiles (409 without `confirm`) |
 | GET | `/users/{user_id}/profiles` | List a user's platform profiles |
 | POST | `/users/{user_id}/profiles` | Add a profile (`platform`: `codeforces` or `leetcode`, `handle`) |
