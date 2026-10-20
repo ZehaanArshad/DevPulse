@@ -213,11 +213,12 @@ def get_user_stats(user: User = Depends(get_authorised_user)):
 def github_login():
 
     state = secrets.token_urlsafe(32)
+    scope = "read:user user:email"
 
     params = {
         "client_id": GITHUB_CLIENT_ID,
         "redirect_uri": "http://localhost:8000/auth/github/callback",
-        "scope": "read:user",
+        "scope": scope,
         "state": state,
     }
 
@@ -237,12 +238,126 @@ def github_login():
 
 
 @app.get("/auth/github/callback")
-def github_callback(request: Request, code: str, state: str):
+def github_callback(
+    request: Request, code: str, state: str, db: Session = Depends(get_db)
+):
 
-    cookie_state = request.cookies.get("oauth_state")
+    github_cookie = request.cookies.get("oauth_state")
 
-    if not cookie_state:
+    GITHUB_URI = "http://localhost:8000/auth/github/callback"
+
+    if not github_cookie or not secrets.compare_digest(github_cookie, state):
         raise HTTPException(status_code=400, detail="Invalid Oauth state")
+
+    token_response = httpx.post(
+        "https://github.com/login/oauth/access_token",
+        data={
+            "client_id": GITHUB_CLIENT_ID,
+            "client_secret": GITHUB_CLIENT_SECRET,
+            "code": code,
+            "redirect_uri": GITHUB_URI,
+        },
+        headers={"Accept": "application/json"},
+    )
+
+    if token_response.status_code != 200:
+
+        raise HTTPException(
+            status_code=400, detail="Failed to fetch access token from Github"
+        )
+
+    token_data = token_response.json()
+    access_token = token_data.get("access_token")
+
+    if not access_token:
+        error_detail = token_data.get(
+            "error_description", "Github did not return an access token"
+        )
+
+        raise HTTPException(status_code=400, detail=error_detail)
+
+    profile_response = httpx.get(
+        "https://api.github.com/user",
+        headers={
+            "Authorization": f"Bearer {access_token}",
+            "Accept": "application/vnd.github+json",
+        },
+    )
+
+    if profile_response.status_code != 200:
+        raise HTTPException(
+            status_code=400, detail="Failed to fetch user profile from Github"
+        )
+
+    profile_data = profile_response.json()
+    github_id = profile_data["id"]
+    github_username = profile_data["login"]
+
+    emails_response = httpx.get(
+        "https://api.github.com/user/emails",
+        headers={
+            "Authorization": f"Bearer {access_token}",
+            "Accept": "application/vnd.github+json",
+        },
+    )
+
+    if emails_response.status_code != 200:
+        raise HTTPException(
+            status_code=400, detail="Failed to fetch emails from Github"
+        )
+
+    email_data = emails_response.json()
+    primary_email_entry = next(
+        (item for item in email_data if item.get("primary") and item.get("verified")),
+        None,
+    )
+
+    if not primary_email_entry:
+        raise HTTPException(
+            status_code=400,
+            detail="No verified primary email found on GitHub account.",
+        )
+
+    email = primary_email_entry["email"].strip().lower()
+
+    user = db.query(User).filter_by(github_id=github_id).first()
+
+    if not user:
+        user = db.query(User).filter_by(email=email).first()
+
+        if user:
+            user.github_id = github_id
+            db.commit()
+
+    if not user:
+
+        base_username = github_username
+        username = base_username
+
+        while db.query(User).filter_by(username=username).first():
+            username = f"{base_username}_{secrets.token_hex(2)}"
+
+        new_user = User(
+            username=username,
+            email=email,
+            github_id=github_id,
+        )
+
+        db.add(new_user)
+        db.commit()
+        db.refresh(new_user)
+
+        user = new_user
+
+    github_access_token = create_access_token(user.id)
+
+    response = RedirectResponse(
+        url=f"http://localhost:5173/auth/callback#token={github_access_token}",
+        status_code=307,
+    )
+
+    response.delete_cookie("oauth_state")
+    return response
 
 
 @app.get("/auth/google/login")
