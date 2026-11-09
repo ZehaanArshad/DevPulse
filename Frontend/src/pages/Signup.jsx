@@ -5,9 +5,9 @@ import { FaGithub, FaFacebook } from 'react-icons/fa'
 import logo from '../assets/logo.gif'
 import lineAnimation from '../assets/lineAnimation.gif'
 import signupimg from '../assets/logo.gif'
-
 import { useNavigate } from 'react-router-dom'
 import { signup, login } from '../api/api'
+import { BASE_URL } from '../api/client'
 
 
 
@@ -45,6 +45,11 @@ async function handleSubmit(e) {
     setLoading(false)
   }
 }
+function handleOAuth(provider) {
+  window.location.href = `${BASE_URL}/auth/${provider}/login`
+}
+
+
   
   return (
     <div className="h-screen flex flex-col bg-[#FCF2E9] font-serif">
@@ -123,12 +128,15 @@ async function handleSubmit(e) {
             <div className="mt-2 flex gap-3">
               <button
                 type="button"
+                onClick={() => handleOAuth('google')}
                 className="flex flex-1 items-center justify-center rounded-md bg-white py-1.5 hover:opacity-90 hover:border border-[#000000]/70"
               >
                 <FcGoogle size={22} />
               </button>
               <button
                 type="button"
+                onClick={() => handleOAuth('github')}
+
                 className="flex flex-1 items-center justify-center rounded-md bg-white py-1.5 hover:opacity-90 hover:border border-[#000000]/70"
               >
                 <FaGithub size={22} className="text-black" />
