@@ -27,6 +27,8 @@ from auth import (
 )
 from collections import Counter
 from datetime import datetime, timedelta, timezone
+from activity import compute_streaks
+
 
 
 app = FastAPI()
@@ -221,6 +223,8 @@ def get_user_stats(user: User = Depends(get_authorised_user)):
             total_activity.update(stats["activity"])    
 
     total_activity={day: n for day,n in total_activity.items() if day>=cutoff}
+
+    current_streak,max_streak=compute_streaks(total_activity)
     
     summary = {
         "profiles_linked": len(results),
@@ -229,7 +233,9 @@ def get_user_stats(user: User = Depends(get_authorised_user)):
         "leetcode_total_solved": sum(lc_solved),
         "activity": total_activity,
         "active_days": len(total_activity),
-        "submissions":sum(total_activity.values())
+        "submissions":sum(total_activity.values()),
+        "current_streak": current_streak,
+        "max_streak": max_streak,
     }
 
     return {"username": user.username, "summary": summary, "profiles": results}
