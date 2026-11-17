@@ -28,6 +28,7 @@ from auth import (
 from collections import Counter
 from datetime import datetime, timedelta, timezone
 from activity import compute_streaks
+from topics import merge_topics
 
 
 
@@ -239,6 +240,12 @@ def get_user_stats(user: User = Depends(get_authorised_user)):
 
     total_activity={day: n for day,n in total_activity.items() if day>=cutoff}
 
+    topic_lists = [
+        r["stats"]["topics"]
+        for r in results
+        if r["stats"] and r["stats"].get("topics")
+    ]
+
     current_streak,max_streak=compute_streaks(total_activity)
     
     summary = {
@@ -251,6 +258,7 @@ def get_user_stats(user: User = Depends(get_authorised_user)):
         "submissions":sum(total_activity.values()),
         "current_streak": current_streak,
         "max_streak": max_streak,
+        "topics": merge_topics(topic_lists),
     }
 
     return {"username": user.username, "summary": summary, "profiles": results}
