@@ -172,3 +172,18 @@ def fetch_codeforces_solved(handle:str) -> tuple[Optional[dict], Optional[str]]:
 
     return {"all": sum(counts.values()), **counts, "topics": topics,"activity":dict(activity)},None
 
+def validate_handle(platform: str, handle:str) -> Optional[str]:
+
+    """Return None if the handle exists, otherwise a reason string."""
+
+    if platform=="codeforces":
+        _,error = fetch_codeforces(handle)
+
+        
+        return error
+
+    if platform == "leetcode":
+        stats = fetch_leetcode(handle)
+        return None if stats is not None else "not_found"
+
+    return "unsupported_platform"
