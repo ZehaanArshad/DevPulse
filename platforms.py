@@ -99,7 +99,7 @@ def fetch_leetcode(handle: str) -> Optional[dict]:
     ),
     key=lambda t: t["count"],
     reverse=True,
-    )[:10]
+    )[:]
 
     solved["topics"]=topics
 
@@ -176,7 +176,7 @@ def fetch_codeforces_solved(handle:str) -> tuple[Optional[dict], Optional[str]]:
 
     topics=[
         {"name":name,"count":count}
-        for name,count in topic_counts.most_common(10)
+        for name,count in topic_counts.most_common()
     ]
 
     
