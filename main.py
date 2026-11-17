@@ -25,6 +25,8 @@ from auth import (
     GOOGLE_CLIENT_ID,
     GOOGLE_CLIENT_SECRET,
 )
+from collections import Counter
+from datetime import datetime, timedelta, timezone
 
 
 app = FastAPI()
@@ -208,11 +210,26 @@ def get_user_stats(user: User = Depends(get_authorised_user)):
         if r["platform"].lower() == "leetcode" and r["stats"]
     ]
 
+    cutoff=(datetime.now(timezone.utc).date() - timedelta(days=365)).isoformat()
+
+    total_activity=Counter()
+
+    for r in results:
+        stats=r["stats"]
+
+        if stats and stats.get("activity"):
+            total_activity.update(stats["activity"])    
+
+    total_activity={day: n for day,n in total_activity.items() if day>=cutoff}
+    
     summary = {
         "profiles_linked": len(results),
         "profiles_resolved": sum(1 for r in results if r["stats"]),
         "best_codeforces_rating": max(cf_ratings, default=None),
         "leetcode_total_solved": sum(lc_solved),
+        "activity": total_activity,
+        "active_days": len(total_activity),
+        "submissions":sum(total_activity.values())
     }
 
     return {"username": user.username, "summary": summary, "profiles": results}
