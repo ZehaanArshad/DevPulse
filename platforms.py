@@ -1,5 +1,6 @@
 import httpx
 from typing import Optional
+from collections import Counter
 
 CF_URL = "https://codeforces.com/api/user.info"
 
@@ -116,6 +117,7 @@ def fetch_codeforces_solved(handle:str) -> tuple[Optional[dict], Optional[str]]:
 
 
     solved= {}
+    tags_by_problem={}
 
     for sub in data["result"]:
 
@@ -127,8 +129,22 @@ def fetch_codeforces_solved(handle:str) -> tuple[Optional[dict], Optional[str]]:
         key= (problem.get("contestId"), problem["index"])
 
         solved[key]=problem.get("rating")
+        tags_by_problem[key]=problem.get("tags",[])
 
     counts={"easy":0,"medium":0,"hard":0}
+
+    topic_counts=Counter()
+
+    for tags in tags_by_problem.values():
+        topic_counts.update(tags)
+
+    topics=[
+        {"name":name,"count":count}
+        for name,count in topic_counts.most_common(10)
+    ]
+
+    
+
 
     for (contest_id, index), rating in solved.items():
 
@@ -139,8 +155,5 @@ def fetch_codeforces_solved(handle:str) -> tuple[Optional[dict], Optional[str]]:
         else:
             counts[bucket_from_index(index)]+=1
 
-    return {"all":sum(counts.values()),**counts},None
-
-
-
+    return {"all": sum(counts.values()), **counts, "topics": topics},None
 
