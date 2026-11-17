@@ -5,6 +5,7 @@ import Dashboard from './pages/Dashboard'
 import LinkPlatform from './pages/LinkPlatform'
 import Platform from './pages/Platform'
 import ProtectedRoute from './components/ProtectedRoute'
+import AuthCallback from './pages/AuthCallback'
 
 
 function App() {
@@ -34,6 +35,8 @@ function App() {
 
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<Signup />} />
+      <Route path="/auth/callback" element={<AuthCallback />} />
+
     </Routes>
   )
 }

@@ -1,6 +1,7 @@
 import { getToken, clearToken } from './auth'
 
-const BASE_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:8000'
+export const BASE_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:8000'
+
 
 export async function apiFetch(path, options = {}) {
 
