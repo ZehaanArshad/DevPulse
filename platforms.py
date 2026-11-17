@@ -36,18 +36,19 @@ def fetch_codeforces(handle: str) -> tuple[Optional[dict], Optional[str]]:
 
 
 LC_URL = "https://leetcode.com/graphql"
-LC_QUERY = """
-
-query($username: String!) {
+LC_QUERY = """query($username: String!) {
     matchedUser(username: $username) {
         submitStats: submitStatsGlobal {
             acSubmissionNum {difficulty count}
         }
         submissionCalendar
+        tagProblemCounts {
+            fundamental { tagName problemsSolved }
+            intermediate { tagName problemsSolved }
+            advanced { tagName problemsSolved }
+        }
     }
-}
-"""
-
+}"""
 
 def fetch_leetcode(handle: str) -> Optional[dict]:
     try:
@@ -81,6 +82,26 @@ def fetch_leetcode(handle: str) -> Optional[dict]:
         activity[day]=count
 
     solved["activity"]=activity
+
+    groups=user.get("tagProblemCounts") or {}
+
+    tags=[]
+
+    for level in ("fundamental", "intermediate", "advanced"):
+
+        tags.extend(groups.get(level) or [])
+
+    topics =sorted(
+        (
+        {"name": t["tagName"], "count": t["problemsSolved"]}
+        for t in tags
+        if t["problemsSolved"]>0
+    ),
+    key=lambda t: t["count"],
+    reverse=True,
+    )[:10]
+
+    solved["topics"]=topics
 
     return solved
 
