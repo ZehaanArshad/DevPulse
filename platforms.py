@@ -1,6 +1,7 @@
 import httpx
 from typing import Optional
 from collections import Counter
+from datetime import datetime, timezone
 
 CF_URL = "https://codeforces.com/api/user.info"
 
@@ -118,8 +119,11 @@ def fetch_codeforces_solved(handle:str) -> tuple[Optional[dict], Optional[str]]:
 
     solved= {}
     tags_by_problem={}
+    activity=Counter()
 
     for sub in data["result"]:
+        day=datetime.fromtimestamp(sub["creationTimeSeconds"], tz=timezone.utc).date().isoformat()
+        activity[day]+=1
 
         if sub.get("verdict")!="OK":
             continue
@@ -155,5 +159,5 @@ def fetch_codeforces_solved(handle:str) -> tuple[Optional[dict], Optional[str]]:
         else:
             counts[bucket_from_index(index)]+=1
 
-    return {"all": sum(counts.values()), **counts, "topics": topics},None
+    return {"all": sum(counts.values()), **counts, "topics": topics,"activity":dict(activity)},None
 
