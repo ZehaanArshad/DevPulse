@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from database import get_db
 from models import User, Profile
 from schemas import UserCreate, ProfileCreate
-from platforms import fetch_codeforces, fetch_leetcode,fetch_codeforces_solved
+from platforms import fetch_codeforces, fetch_leetcode,fetch_codeforces_solved,validate_handle
 from sqlalchemy import func
 from schemas import UserCreate, UserOut, UserLogin, TokenOut
 from auth import (
@@ -125,9 +125,24 @@ def create_user_profile(
     )
 
     if existing:
+
         raise HTTPException(
             status_code=409,
             detail=f"{profile.platform} handle {profile.handle} is already linked to this user",
+        )
+    error=validate_handle(profile.platform, profile.handle)
+
+    if error=="not_found":
+
+        raise HTTPException(
+            status_code=404,
+            detail=f"{profile.platform} handle {profile.handle} not found",
+        )
+
+    if error is not None:
+        raise HTTPException(
+            status_code = 503,
+            detail= f"Could not verify handle right now ({error}), please try again"
         )
 
     new_profile = Profile(
