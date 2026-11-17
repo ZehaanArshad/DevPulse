@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from database import get_db
 from models import User, Profile
 from schemas import UserCreate, ProfileCreate
-from platforms import fetch_codeforces, fetch_leetcode
+from platforms import fetch_codeforces, fetch_leetcode,fetch_codeforces_solved
 from sqlalchemy import func
 from schemas import UserCreate, UserOut, UserLogin, TokenOut
 from auth import (
@@ -25,6 +25,7 @@ from auth import (
     GOOGLE_CLIENT_ID,
     GOOGLE_CLIENT_SECRET,
 )
+
 
 app = FastAPI()
 
@@ -176,6 +177,12 @@ def get_user_stats(user: User = Depends(get_authorised_user)):
         platform = p.platform.lower()
         if platform == "codeforces":
             stats, error = fetch_codeforces(p.handle)
+
+            if stats is not None:
+                solved,_ = fetch_codeforces_solved(p.handle)
+
+                if solved:
+                    stats={**stats,**solved}
 
         elif platform == "leetcode":
             stats = fetch_leetcode(p.handle)
