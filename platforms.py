@@ -4,16 +4,24 @@ from typing import Optional
 CF_URL = "https://codeforces.com/api/user.info"
 
 
-def fetch_codeforces(handle: str) -> Optional[dict]:
+def fetch_codeforces(handle: str) -> tuple[Optional[dict], Optional[str]]:
     try:
         resp = httpx.get(CF_URL, params={"handles": handle}, timeout=10)
         data = resp.json()
 
     except (httpx.HTTPError, ValueError):
-        return None
+        return None, "unavailable"
 
     if data.get("status") != "OK":
-        return None
+        comment=data.get("comment", "")
+
+        if "not found" in comment:
+            return None, "not_found"
+
+        if "limit" in comment.lower():
+            return None, "rate_limited"
+
+        return None, "unavailable"
 
     info = data["result"][0]
 
@@ -22,7 +30,7 @@ def fetch_codeforces(handle: str) -> Optional[dict]:
         "max_rating": info.get("maxRating"),
         "rank": info.get("rank"),
         "max_rank": info.get("maxRank"),
-    }
+    }, None
 
 
 LC_URL = "https://leetcode.com/graphql"

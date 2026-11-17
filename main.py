@@ -175,15 +175,17 @@ def get_user_stats(user: User = Depends(get_authorised_user)):
     for p in user.profiles:
         platform = p.platform.lower()
         if platform == "codeforces":
-            stats = fetch_codeforces(p.handle)
+            stats, error = fetch_codeforces(p.handle)
 
         elif platform == "leetcode":
             stats = fetch_leetcode(p.handle)
+            error = None
 
         else:
             stats = None
+            error="unsupported_platform"
 
-        results.append({"platform": p.platform, "handle": p.handle, "stats": stats})
+        results.append({"platform": p.platform, "handle": p.handle, "stats": stats,"error": error})
 
     cf_ratings = [
         r["stats"]["rating"]
