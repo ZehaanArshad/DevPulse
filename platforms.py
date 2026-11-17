@@ -4,16 +4,24 @@ from typing import Optional
 CF_URL = "https://codeforces.com/api/user.info"
 
 
-def fetch_codeforces(handle: str) -> Optional[dict]:
+def fetch_codeforces(handle: str) -> tuple[Optional[dict], Optional[str]]:
     try:
         resp = httpx.get(CF_URL, params={"handles": handle}, timeout=10)
         data = resp.json()
 
     except (httpx.HTTPError, ValueError):
-        return None
+        return None, "unavailable"
 
     if data.get("status") != "OK":
-        return None
+        comment=data.get("comment", "")
+
+        if "not found" in comment:
+            return None, "not_found"
+
+        if "limit" in comment.lower():
+            return None, "rate_limited"
+
+        return None, "unavailable"
 
     info = data["result"][0]
 
@@ -22,7 +30,7 @@ def fetch_codeforces(handle: str) -> Optional[dict]:
         "max_rating": info.get("maxRating"),
         "rank": info.get("rank"),
         "max_rank": info.get("maxRank"),
-    }
+    }, None
 
 
 LC_URL = "https://leetcode.com/graphql"
@@ -62,3 +70,77 @@ def fetch_leetcode(handle: str) -> Optional[dict]:
     }
 
     return solved
+
+CF_STATUS_URL= "https://codeforces.com/api/user.status"
+
+def bucket_from_rating(rating : int) ->str:
+
+    if rating<=1200:
+        return "easy"
+
+    elif rating<=1800:
+        return "medium"
+
+    return "hard"
+
+
+def bucket_from_index(index : str) -> str:
+
+    letter=index[0]
+
+    if letter in "AB":
+        return "easy"
+    elif letter in "C":
+        return "medium"
+
+    return "hard"
+
+
+def fetch_codeforces_solved(handle:str) -> tuple[Optional[dict], Optional[str]]:
+
+    try:
+        resp=httpx.get(CF_STATUS_URL, params={"handle":handle }, timeout=10)
+        data=resp.json()
+
+    except (httpx.HTTPError, ValueError):
+
+        return None, "unavailable"
+
+    if data.get("status") != "OK":
+        comment = data.get("comment", "")
+        if "not found" in comment:
+            return None, "not_found"
+        if "limit" in comment.lower():
+            return None, "rate_limited"
+        return None, "unavailable"
+
+
+    solved= {}
+
+    for sub in data["result"]:
+
+        if sub.get("verdict")!="OK":
+            continue
+
+        problem=sub["problem"]
+
+        key= (problem.get("contestId"), problem["index"])
+
+        solved[key]=problem.get("rating")
+
+    counts={"easy":0,"medium":0,"hard":0}
+
+    for (contest_id, index), rating in solved.items():
+
+        if rating is not None:
+
+            counts[bucket_from_rating(rating)]+=1
+
+        else:
+            counts[bucket_from_index(index)]+=1
+
+    return {"all":sum(counts.values()),**counts},None
+
+
+
+
