@@ -1,5 +1,7 @@
-import httpx
+import httpx,json
 from typing import Optional
+from collections import Counter
+from datetime import datetime, timezone
 
 CF_URL = "https://codeforces.com/api/user.info"
 
@@ -41,6 +43,7 @@ query($username: String!) {
         submitStats: submitStatsGlobal {
             acSubmissionNum {difficulty count}
         }
+        submissionCalendar
     }
 }
 """
@@ -68,6 +71,16 @@ def fetch_leetcode(handle: str) -> Optional[dict]:
         row["difficulty"].lower(): row["count"]
         for row in user["submitStats"]["acSubmissionNum"]
     }
+
+    calendar=json.loads(user.get("submissionCalendar") or "{}")
+
+    activity={}
+
+    for ts,count in calendar.items():
+        day=datetime.fromtimestamp(int(ts), tz=timezone.utc).date().isoformat()
+        activity[day]=count
+
+    solved["activity"]=activity
 
     return solved
 
@@ -116,8 +129,12 @@ def fetch_codeforces_solved(handle:str) -> tuple[Optional[dict], Optional[str]]:
 
 
     solved= {}
+    tags_by_problem={}
+    activity=Counter()
 
     for sub in data["result"]:
+        day=datetime.fromtimestamp(sub["creationTimeSeconds"], tz=timezone.utc).date().isoformat()
+        activity[day]+=1
 
         if sub.get("verdict")!="OK":
             continue
@@ -127,8 +144,22 @@ def fetch_codeforces_solved(handle:str) -> tuple[Optional[dict], Optional[str]]:
         key= (problem.get("contestId"), problem["index"])
 
         solved[key]=problem.get("rating")
+        tags_by_problem[key]=problem.get("tags",[])
 
     counts={"easy":0,"medium":0,"hard":0}
+
+    topic_counts=Counter()
+
+    for tags in tags_by_problem.values():
+        topic_counts.update(tags)
+
+    topics=[
+        {"name":name,"count":count}
+        for name,count in topic_counts.most_common(10)
+    ]
+
+    
+
 
     for (contest_id, index), rating in solved.items():
 
@@ -139,8 +170,5 @@ def fetch_codeforces_solved(handle:str) -> tuple[Optional[dict], Optional[str]]:
         else:
             counts[bucket_from_index(index)]+=1
 
-    return {"all":sum(counts.values()),**counts},None
-
-
-
+    return {"all": sum(counts.values()), **counts, "topics": topics,"activity":dict(activity)},None
 
