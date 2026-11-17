@@ -1,4 +1,4 @@
-import httpx
+import httpx,json
 from typing import Optional
 from collections import Counter
 from datetime import datetime, timezone
@@ -43,6 +43,7 @@ query($username: String!) {
         submitStats: submitStatsGlobal {
             acSubmissionNum {difficulty count}
         }
+        submissionCalendar
     }
 }
 """
@@ -70,6 +71,16 @@ def fetch_leetcode(handle: str) -> Optional[dict]:
         row["difficulty"].lower(): row["count"]
         for row in user["submitStats"]["acSubmissionNum"]
     }
+
+    calendar=json.loads(user.get("submissionCalendar") or "{}")
+
+    activity={}
+
+    for ts,count in calendar.items():
+        day=datetime.fromtimestamp(int(ts), tz=timezone.utc).date().isoformat()
+        activity[day]=count
+
+    solved["activity"]=activity
 
     return solved
 
