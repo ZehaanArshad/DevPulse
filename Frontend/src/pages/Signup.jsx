@@ -58,17 +58,17 @@ function handleOAuth(provider) {
       <div className="flex-1 min-h-0 p-8">
         <div
           // style={{ backgroundImage: `url(${lineAnimation})` }}
-          className="flex-1 min-h-0  w-full h-full bg-cover bg-center bg-no-repeat rounded-2xl flex items-center justify-center gap-5 bg-[#2877D7]/50"
+          className="flex-1 min-h-0  w-full h-full bg-cover bg-center bg-no-repeat rounded-2xl flex items-center justify-center gap-5 "
         >
+          {/* bg-[#2877D7]/50 */}
 
-
-          <div>
+          {/* <div>
             <img src={signupimg} alt="DevPulse logo" className="rounded-2xl object-cover w-200 h-180 shadow-xl border border-[#9CC0ED]" />
-          </div>
+          </div> */}
 
 
 
-          <div className="w-full max-w-md rounded-2xl p-10 text-white backdrop-blur-3xl shadow-xl border border-[#9CC0ED]">
+          <div className="w-full max-w-md rounded-2xl p-10 text-white backdrop-blur-3xl shadow-xl border border-[#9CC0ED] bg-[#2877D7]/50">
             <Link to="/" className="font-bold hover:underline hover:text-[#2877D7] flex items-center justify-center">
               <img src={logo} alt="DevPulse logo" className=" h-40 w-95 object-cover rounded-2xl hover:border border-[#ffff]" />
             </Link>
@@ -154,11 +154,11 @@ function handleOAuth(provider) {
           </div>
 
           <div>
-            <Link to="/" className="font-bold hover:underline hover:text-[#2877D7] flex items-center justify-center">
+            {/* <Link to="/" className="font-bold hover:underline hover:text-[#2877D7] flex items-center justify-center">
               <div className='h-189 w-30 flex items-center justify-center'>
                 <p>HomePage</p>
               </div>
-            </Link>
+            </Link> */}
           </div>
 
 
