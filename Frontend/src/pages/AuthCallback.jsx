@@ -29,7 +29,7 @@ function AuthCallback() {
     }
 
     finishLogin()
-  }, [])
+  }, [navigate])
 
   return <p>Signing you in...</p>
 }
