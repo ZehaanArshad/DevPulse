@@ -1,12 +1,16 @@
 import { apiFetch } from './client'
 import { setToken, setUserId } from './auth'
 
-export async function signup(username, password) {
-  return apiFetch('/signup', { method: 'POST', body: { username, password } })
+export async function signup(username, email, password) {
+
+  return apiFetch('/signup', { method: 'POST', body: { username, email, password } })
+
 }
 
-export async function login(username, password) {
-  const data = await apiFetch('/login', { method: 'POST', body: { username, password } })
+export async function login(email, password) {
+
+  const data = await apiFetch('/login', { method: 'POST', body: { email, password } })
+
   setToken(data.access_token)
   const me = await getMe()
   setUserId(me.id)

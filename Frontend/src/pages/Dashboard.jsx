@@ -4,6 +4,7 @@ import ContributionHeatmap from '../components/dashboard/ContributionHeatmap'
 import DifficultyDonut from '../components/dashboard/DifficultyDonut'
 import TopicBars from '../components/dashboard/TopicBars'
 import { dashboardData } from '../data/dashboardData'
+import { buildHeatmap } from '../data/buildHeatmap'
 
 import { useState, useEffect } from 'react'
 import { getStats } from '../api/api'
@@ -28,8 +29,14 @@ useEffect(() => {
   load()
 }, [])
 // console.log(stats)
+const summary = stats?.summary ?? {}
+
+const heatmap = buildHeatmap(summary.activity)
+
 
 const profiles = stats?.profiles ?? []
+const cf = profiles.find((p) => p.platform === 'codeforces')?.stats
+
 
 const totalSolved = profiles.reduce((sum, p) => sum + (p.stats?.all ?? 0), 0)
 
@@ -43,6 +50,23 @@ const difficulty = profiles.reduce(
   { total: 0, easy: 0, medium: 0, hard: 0 }
 )
 
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#FCF2E9]">
+        <Header items={dashboardData.problemPlatforms} />
+        <p className="px-8 text-neutral-900">Loading...</p>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-[#FCF2E9]">
+        <Header items={dashboardData.problemPlatforms} />
+        <p className="px-8 text-red-600">{error}</p>
+      </div>
+    )
+  }
 
 
   return (
@@ -53,7 +77,18 @@ const difficulty = profiles.reduce(
       <div className="flex px-8 pb-4">
         <div className="flex gap-4">
           <StatCard label="Questions Solved" value={totalSolved} />
-          <StatCard label="Active Days" value={dashboardData.stats.activeDays} />
+          <StatCard label="Active Days" value={summary.active_days ?? 0} />
+          {cf && (
+            <>
+              <StatCard label="Rating" value={cf.rating ?? '—'} />
+              <StatCard label="Max Rating" value={cf.max_rating ?? '—'} />
+              <StatCard label="Rank" value={cf.rank ?? 'Unrated'} />
+              <StatCard label="Max Rank" value={cf.max_rank ?? 'Unrated'} />
+            </>
+          )}
+
+
+
         </div>
 
         {/* <ContributionHeatmap heatmap={dashboardData.heatmap} /> */}
@@ -62,13 +97,17 @@ const difficulty = profiles.reduce(
       </div>
 
       <div className="grid grid-cols-[1fr_320px] gap-4 px-8 pb-4">
-        <ContributionHeatmap heatmap={dashboardData.heatmap} />
+        <ContributionHeatmap heatmap={heatmap} />
+
         <DifficultyDonut difficulty={difficulty} />
       </div>
 
       <div className="px-8 pb-8">
-        <TopicBars topics={dashboardData.topics} />
+        {(summary.topics ?? []).length > 0 && (
+          <TopicBars topics={summary.topics.slice(0, 10)} />
+        )}
       </div>
+
     </div>
   )
 }
