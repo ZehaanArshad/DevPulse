@@ -13,6 +13,7 @@ import { BASE_URL } from '../api/client'
 
 function Signup() {
   const [userName, setUserName] = useState('')
+  const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [confirm, setConfirm] = useState('')
   const [error, setError] = useState('')
@@ -36,8 +37,8 @@ async function handleSubmit(e) {
 
   try {
     setLoading(true)
-    await signup(userName, password)
-    await login(userName, password)
+    await signup(userName, email.trim(), password)
+    await login(email.trim(), password)
     navigate('/')
   } catch (err) {
     setError(err.message)
@@ -84,12 +85,14 @@ function handleOAuth(provider) {
               px-3 py-1.5 text-sm text-neutral-900 outline-none hover:border border-[#000000]/70 focus:border"
               />
 
-              {/* <label className="text-sm text-neutral-900">Email</label>
+              <label className="text-sm text-neutral-900">Email</label>
               <input
                 type="email"
                 placeholder="username@gmail.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 className="rounded-md bg-white px-3 py-1.5 text-sm text-neutral-900 outline-none hover:border border-[#000000]/70 focus:border"
-              /> */}
+              />
 
               <label className="text-sm text-neutral-900">Password</label>
               <input
@@ -114,9 +117,7 @@ function handleOAuth(provider) {
               <button
               type="submit"
               disabled={loading}
-              className="mt-2 rounded-md bg-[#2877D7] py-
-              font-semibold text-white hover:opacity-90 hover:borde
-              border-[#000000]/70 disabled:opacity-50"
+              className="mt-2 rounded-md bg-[#2877D7] py-2 font-semibold text-white hover:opacity-90 hover:border border-[#000000]/70 disabled:opacity-50"
               >
                 {loading ? 'Creating...' : 'Sign Up'}
                 </button>

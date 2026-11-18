@@ -52,7 +52,7 @@ function Header({ activeTo, items, activeKey }) {
 
       <div className="flex items-center gap-4">
         <div className="flex items-center justify-center rounded-full text-sm text-neutral-900 shadow-sm focus-within:bg-[#9CC0ED]/50 backdrop-blur-xl">
-          <span class="material-symbols-outlined text-[#9CC0ED] ml-2 my-2">search</span>
+          <span className="material-symbols-outlined text-[#9CC0ED] ml-2 my-2">search</span>
           <input
             type="text"
             placeholder="Search"

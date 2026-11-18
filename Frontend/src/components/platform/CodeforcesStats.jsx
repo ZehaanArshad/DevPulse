@@ -3,6 +3,11 @@ import { Link } from 'react-router-dom'
 import { getStats } from '../../api/api'
 import { getUserId } from '../../api/auth'
 import StatCard from '../dashboard/StatCard'
+import DifficultyDonut from '../dashboard/DifficultyDonut'
+import ContributionHeatmap from '../dashboard/ContributionHeatmap'
+import TopicBars from '../dashboard/TopicBars'
+import { buildHeatmap } from '../../data/buildHeatmap'
+
 
 function RankCard({ label, value }) {
   return (
@@ -54,14 +59,41 @@ function CodeforcesStats() {
     )
   }
 
+  const heatmap = buildHeatmap(data.activity)
+  const activeDays = heatmap.cells.filter((c) => c.count > 0).length
+
+  
   return (
-    <div className="flex justify-center items-center px-8 pb-4 gap-4 ">
-      <StatCard label="Rating" value={data.rating ?? '—'} />
-      <StatCard label="Max Rating" value={data.max_rating ?? '—'} />
-      <RankCard label="Rank" value={data.rank ?? 'Unrated'} />
-      <RankCard label="Max Rank" value={data.max_rank ?? 'Unrated'} />
-    </div>
+    <>
+      <div className="flex justify-center items-center px-8 pb-4 gap-4 ">
+        <StatCard label="Questions Solved" value={data.all ?? 0} />
+        <StatCard label="Active Days" value={activeDays} />
+        <StatCard label="Rating" value={data.rating ?? '—'} />
+        <StatCard label="Max Rating" value={data.max_rating ?? '—'} />
+        <RankCard label="Rank" value={data.rank ?? 'Unrated'} />
+        <RankCard label="Max Rank" value={data.max_rank ?? 'Unrated'} />
+      </div>
+
+      <div className="grid grid-cols-[1fr_320px] gap-4 px-8 pb-4">
+        <ContributionHeatmap heatmap={heatmap} />
+        <DifficultyDonut
+          difficulty={{
+            total: data.all ?? 0,
+            easy: data.easy ?? 0,
+            medium: data.medium ?? 0,
+            hard: data.hard ?? 0,
+          }}
+        />
+      </div>
+
+      <div className="px-8 pb-8">
+        {(data.topics ?? []).length > 0 && (
+          <TopicBars topics={data.topics.slice(0, 10)} />
+        )}
+      </div>
+    </>
   )
+
 }
 
 export default CodeforcesStats

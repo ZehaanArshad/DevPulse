@@ -4,6 +4,10 @@ import { getStats } from '../../api/api'
 import { getUserId } from '../../api/auth'
 import StatCard from '../dashboard/StatCard'
 import DifficultyDonut from '../dashboard/DifficultyDonut'
+import ContributionHeatmap from '../dashboard/ContributionHeatmap'
+import TopicBars from '../dashboard/TopicBars'
+import { buildHeatmap } from '../../data/buildHeatmap'
+
 
 function LeetCodeStats() {
   const [stats, setStats] = useState(null)
@@ -45,28 +49,31 @@ function LeetCodeStats() {
       </p>
     )
   }
+  const heatmap = buildHeatmap(data.activity)
+  const activeDays = heatmap.cells.filter((c) => c.count > 0).length
 
   return (
-    // _1fr
     <>
-      <div className="grid grid-cols-[150px_320px] gap-4 px-8 pb-4">
-        <div className="flex flex-col gap-4">
-          <StatCard label="Questions Solved" value={data.all} />
-          {/* <StatCard label="Active Days" value={dashboardData.stats.activeDays} /> */}
-        </div>
+      <div className="flex gap-4 px-8 pb-4">
+        <StatCard label="Questions Solved" value={data.all} />
+        <StatCard label="Active Days" value={activeDays} />
+      </div>
 
-        {/* <ContributionHeatmap heatmap={dashboardData.heatmap} /> */}
-
+      <div className="grid grid-cols-[1fr_320px] gap-4 px-8 pb-4">
+        <ContributionHeatmap heatmap={heatmap} />
         <DifficultyDonut
           difficulty={{ total: data.all, easy: data.easy, medium: data.medium, hard: data.hard }}
         />
       </div>
 
       <div className="px-8 pb-8">
-        {/* <TopicBars topics={dashboardData.topics} /> */}
+        {(data.topics ?? []).length > 0 && (
+          <TopicBars topics={data.topics.slice(0, 10)} />
+        )}
       </div>
     </>
   )
+
 }
 
 export default LeetCodeStats

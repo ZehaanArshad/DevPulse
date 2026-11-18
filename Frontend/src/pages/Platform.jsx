@@ -1,4 +1,8 @@
-import { useParams } from 'react-router-dom'
+import { useEffect } from 'react'
+import { useParams, useNavigate } from 'react-router-dom'
+import { getProfiles } from '../api/api'
+import { getUserId } from '../api/auth'
+import { linkablePlatforms } from '../data/linkablePlatforms'
 import Header from '../components/dashboard/Header'
 import { dashboardData } from '../data/dashboardData'
 import LinkPlatform from './LinkPlatform'
@@ -15,6 +19,23 @@ const groups = [
 
 function Platform() {
   const { name } = useParams()
+  const navigate = useNavigate()
+
+  // Direct URL / tab se aaye aur profile add nahi hai -> connect page par bhejo
+  useEffect(() => {
+    if (!linkablePlatforms.includes(name)) return
+    async function check() {
+      try {
+        const profiles = await getProfiles(getUserId())
+        if (!profiles.some((p) => p.platform === name)) {
+          navigate('/platform/connect', { replace: true })
+        }
+      } catch {
+        // API fail ho to page waise hi dikhao
+      }
+    }
+    check()
+  }, [name, navigate])
   const group = groups.find((g) => g.id === name || g.items.some((item) => item.key === name))
 
   return (

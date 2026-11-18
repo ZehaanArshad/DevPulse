@@ -128,7 +128,7 @@ function LinkPlatform() {
             <span className="whitespace-nowrap">{p.prefix}</span>
             <input
               type="text"
-              placeholder="zehaan"
+              placeholder="username"
               value={handles[p.key] ?? ''}
               onChange={(e) => handleChange(p.key, e.target.value)}
               className="ml-1 flex-1 bg-transparent outline-none placeholder:text-neutral-400"

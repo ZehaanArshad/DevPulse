@@ -11,7 +11,7 @@ import loginimg from '../assets/logo.gif'
 
 
 function Login() {
-  const [userName, setUserName] = useState('')
+  const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
@@ -21,14 +21,15 @@ async function handleSubmit(e) {
   e.preventDefault()
   setError('')
 
-  if (!userName.trim() || !password) {
-    setError('Username aur password dono daalo')
+  if (!email.trim() || !password) {
+    setError('Email aur password dono daalo')
+
     return
   }
 
   try {
     setLoading(true)
-    await login(userName, password)
+    await login(email.trim(), password)
     navigate('/')
   } catch (err) {
     setError(err.message)
@@ -65,7 +66,7 @@ function handleOAuth(provider) {
             <h2 className="mt-6 text-3xl font-semibold text-center font-serif text-neutral-900">Welcome Back</h2>
 
             <form onSubmit={handleSubmit} className="mt-4 flex flex-col gap-3">
-              <label className="text-sm text-neutral-900">UserName</label>
+              {/* <label className="text-sm text-neutral-900">UserName</label>
               <input
               type="text"
               placeholder="UserName"
@@ -73,14 +74,16 @@ function handleOAuth(provider) {
               onChange={(e) => setUserName(e.target.value)}
               className="rounded-md bg-white
               px-3 py-1.5 text-sm text-neutral-900 outline-none hover:border border-[#000000]/70 focus:border"
-              />
+              /> */}
               
-              {/* <label className="text-sm text-neutral-900">Email</label>
+              <label className="text-sm text-neutral-900">Email</label>
               <input
                 type="email"
                 placeholder="username@gmail.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 className="rounded-md bg-white px-3 py-2.5 text-sm text-neutral-900 outline-none hover:border border-[#000000]/70 focus:border"
-              /> */}
+              />
 
               <label className="text-sm text-neutral-900">Password</label>
               <input
