@@ -205,8 +205,7 @@ def get_user_stats(user: User = Depends(get_authorised_user)):
                     stats={**stats,**solved}
 
         elif platform == "leetcode":
-            stats = fetch_leetcode(p.handle)
-            error = None
+            stats, error =fetch_leetcode(p.handle)
 
         elif platform == "atcoder":
             stats, error = fetch_atcoder(p.handle)
