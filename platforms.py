@@ -1,7 +1,8 @@
 import httpx,json
+from urllib.parse import quote
 from typing import Optional
 from collections import Counter
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 
 CF_URL = "https://codeforces.com/api/user.info"
 
@@ -207,4 +208,135 @@ def validate_handle(platform: str, handle:str) -> Optional[str]:
         stats = fetch_leetcode(handle)
         return None if stats is not None else "not_found"
 
+    if platform == "atcoder":
+        return atcoder_exists(handle)
+
     return "unsupported_platform"
+
+AT_USER_URL = "https://atcoder.jp/users/"
+KENKO_URL = "https://kenkoooo.com/atcoder/atcoder-api/v3/user"
+AT_HEADERS = {"User-Agent": "DevPulse/1.0"}
+
+
+def atcoder_rank(rating: Optional[int]) -> Optional[str]:
+    """AtCoder's colour tiers: gray <400, brown <800, ... red 2800+."""
+    if rating is None:
+        return None
+
+    tiers = (
+        (400, "gray"),
+        (800, "brown"),
+        (1200, "green"),
+        (1600, "cyan"),
+        (2000, "blue"),
+        (2400, "yellow"),
+        (2800, "orange"),
+    )
+    for limit, colour in tiers:
+        if rating < limit:
+            return colour
+
+    return "red"
+
+
+def atcoder_exists(handle: str) -> Optional[str]:
+    """None if the user page exists, otherwise a reason string."""
+    try:
+        resp = httpx.get(
+            AT_USER_URL + quote(handle, safe=""),
+            headers=AT_HEADERS,
+            timeout=10,
+            follow_redirects=True,
+        )
+    except httpx.HTTPError:
+        return "unavailable"
+
+    if resp.status_code == 404:
+        return "not_found"
+    if resp.status_code == 429:
+        return "rate_limited"
+    if resp.status_code != 200:
+        return "unavailable"
+
+    return None
+
+
+def fetch_atcoder_extras(handle: str) -> tuple[Optional[int], dict]:
+    """Solved count and last-365-days activity from kenkoooo.
+    Returns (None, {}) if kenkoooo is down, so rating still works."""
+    try:
+        resp = httpx.get(
+            f"{KENKO_URL}/ac_rank",
+            params={"user": handle},
+            headers=AT_HEADERS,
+            timeout=10,
+        )
+        solved = resp.json().get("count", 0) if resp.status_code == 200 else 0
+
+        activity = Counter()
+        cursor = int((datetime.now(timezone.utc) - timedelta(days=365)).timestamp())
+
+        for _ in range(10):  # hard cap on pages
+            resp = httpx.get(
+                f"{KENKO_URL}/submissions",
+                params={"user": handle, "from_second": cursor},
+                headers=AT_HEADERS,
+                timeout=15,
+            )
+            if resp.status_code != 200:
+                break
+
+            page = resp.json()
+            if not page:
+                break
+
+            for sub in page:
+                day = (
+                    datetime.fromtimestamp(sub["epoch_second"], tz=timezone.utc)
+                    .date()
+                    .isoformat()
+                )
+                activity[day] += 1
+
+            cursor = page[-1]["epoch_second"] + 1
+
+    except (httpx.HTTPError, ValueError, KeyError):
+        return None, {}
+
+    return solved, dict(activity)
+
+
+def fetch_atcoder(handle: str) -> tuple[Optional[dict], Optional[str]]:
+    try:
+        resp = httpx.get(
+            f"{AT_USER_URL}{quote(handle, safe='')}/history/json",
+            headers=AT_HEADERS,
+            timeout=10,
+            follow_redirects=True,
+        )
+        history = resp.json()
+    except (httpx.HTTPError, ValueError):
+        return None, "unavailable"
+
+    if resp.status_code == 429:
+        return None, "rate_limited"
+    if resp.status_code != 200 or not isinstance(history, list):
+        return None, "unavailable"
+
+    rated = [c for c in history if c.get("IsRated")]
+    ratings = [c["NewRating"] for c in rated]
+
+    rating = ratings[-1] if ratings else None
+    max_rating = max(ratings) if ratings else None
+
+    solved, activity = fetch_atcoder_extras(handle)
+
+    return {
+        "rating": rating,
+        "max_rating": max_rating,
+        "rank": atcoder_rank(rating),
+        "max_rank": atcoder_rank(max_rating),
+        "contests": len(rated),
+        "all": solved,
+        "activity": activity,
+    }, None

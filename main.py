@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from database import get_db
 from models import User, Profile
 from schemas import UserCreate, ProfileCreate
-from platforms import fetch_codeforces, fetch_leetcode,fetch_codeforces_solved,validate_handle
+from platforms import fetch_codeforces, fetch_leetcode, fetch_codeforces_solved, validate_handle, fetch_atcoder
 from sqlalchemy import func
 from schemas import UserCreate, UserOut, UserLogin, TokenOut
 from auth import (
@@ -208,6 +208,9 @@ def get_user_stats(user: User = Depends(get_authorised_user)):
             stats = fetch_leetcode(p.handle)
             error = None
 
+        elif platform == "atcoder":
+            stats, error = fetch_atcoder(p.handle)
+
         else:
             stats = None
             error="unsupported_platform"
@@ -227,6 +230,16 @@ def get_user_stats(user: User = Depends(get_authorised_user)):
         for r in results
         if r["platform"].lower() == "leetcode" and r["stats"]
     ]
+
+    at_ratings = [
+        r["stats"]["rating"]
+        for r in results
+        if r["platform"].lower() =="atcoder" and r["stats"] and r["stats"]["rating"] is not None
+    ]
+
+    total_solved = sum(
+        (r["stats"].get("all") or 0) for r in results if r["stats"]
+    )
 
     cutoff=(datetime.now(timezone.utc).date() - timedelta(days=365)).isoformat()
 
@@ -253,6 +266,8 @@ def get_user_stats(user: User = Depends(get_authorised_user)):
         "profiles_resolved": sum(1 for r in results if r["stats"]),
         "best_codeforces_rating": max(cf_ratings, default=None),
         "leetcode_total_solved": sum(lc_solved),
+        "best_atcoder_rating": max(at_ratings, default = None),
+        "total_solved": total_solved,
         "activity": total_activity,
         "active_days": len(total_activity),
         "submissions":sum(total_activity.values()),

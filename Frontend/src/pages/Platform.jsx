@@ -8,6 +8,7 @@ import { dashboardData } from '../data/dashboardData'
 import LinkPlatform from './LinkPlatform'
 import LeetCodeStats from '../components/platform/LeetCodeStats'
 import CodeforcesStats from '../components/platform/CodeforcesStats'
+import AtCoderStats from '../components/platform/AtCoderStats'
 
 
 
@@ -49,6 +50,8 @@ function Platform() {
       <LeetCodeStats />
     ) : name === 'codeforces' ? (
     <CodeforcesStats />
+  ) : name === 'atcoder' ? (
+    <AtCoderStats />
   ) : (
     <div className="px-8 py-4">
       <h1 className="text-3xl font-bold capitalize">{name}</h1>
