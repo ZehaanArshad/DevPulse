@@ -10,7 +10,7 @@ class UserCreate(BaseModel):
 
 
 class ProfileCreate(BaseModel):
-    platform: Literal["codeforces", "leetcode", "atcoder"]
+    platform: Literal["codeforces", "leetcode", "atcoder", "github"]
     handle: str
 
 

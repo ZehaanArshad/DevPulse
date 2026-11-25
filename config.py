@@ -16,6 +16,10 @@ GOOGLE_REDIRECT_URI = f"{BACKEND_URL}/auth/google/callback"
 # Cookies are only marked Secure when the backend is served over https
 COOKIE_SECURE = BACKEND_URL.startswith("https://")
 
+# Optional personal access token (no scopes needed) for GitHub *stats*.
+# Without it GitHub allows only 60 API requests/hour per IP, with it 5000.
+GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
+
 # --- Database (D2) ---
 DATABASE_URL = os.getenv("DATABASE_URL", "")
 
