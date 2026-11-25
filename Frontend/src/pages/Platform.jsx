@@ -9,6 +9,7 @@ import LinkPlatform from './LinkPlatform'
 import LeetCodeStats from '../components/platform/LeetCodeStats'
 import CodeforcesStats from '../components/platform/CodeforcesStats'
 import AtCoderStats from '../components/platform/AtCoderStats'
+import GitHubStats from '../components/platform/GitHubStats'
 
 
 
@@ -52,6 +53,8 @@ function Platform() {
     <CodeforcesStats />
   ) : name === 'atcoder' ? (
     <AtCoderStats />
+  ) : name === 'github' ? (
+    <GitHubStats />
   ) : (
     <div className="px-8 py-4">
       <h1 className="text-3xl font-bold capitalize">{name}</h1>

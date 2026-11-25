@@ -7,6 +7,7 @@ const profilePrefix = {
   leetcode: 'https://leetcode.com/u/',
   codeforces: 'https://codeforces.com/profile/',
   atcoder: 'https://atcoder.jp/users/',
+  github: 'https://github.com/',
 }
 
 
