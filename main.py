@@ -29,14 +29,14 @@ from collections import Counter
 from datetime import datetime, timedelta, timezone
 from activity import compute_streaks
 from topics import merge_topics
-
+from config import FRONTEND_URL, GITHUB_REDIRECT_URI, GOOGLE_REDIRECT_URI, COOKIE_SECURE
 
 
 app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "http://127.0.0.1:5173"],
+    allow_origins=[FRONTEND_URL],
     allow_methods=["GET", "POST", "DELETE"],
     allow_headers=["Authorization", "Content-Type"],
 )
@@ -272,7 +272,7 @@ def github_login():
 
     params = {
         "client_id": GITHUB_CLIENT_ID,
-        "redirect_uri": "http://localhost:8000/auth/github/callback",
+                "redirect_uri": GITHUB_REDIRECT_URI,
         "scope": scope,
         "state": state,
     }
@@ -285,6 +285,7 @@ def github_login():
         key="oauth_state",
         value=state,
         httponly=True,
+        secure=COOKIE_SECURE,
         max_age=300,
         samesite="lax",
     )
@@ -299,8 +300,7 @@ def github_callback(
 
     github_cookie = request.cookies.get("oauth_state")
 
-    GITHUB_URI = "http://localhost:8000/auth/github/callback"
-
+    
     if not github_cookie or not secrets.compare_digest(github_cookie, state):
         raise HTTPException(status_code=400, detail="Invalid Oauth state")
 
@@ -310,7 +310,7 @@ def github_callback(
             "client_id": GITHUB_CLIENT_ID,
             "client_secret": GITHUB_CLIENT_SECRET,
             "code": code,
-            "redirect_uri": GITHUB_URI,
+            "redirect_uri": GITHUB_REDIRECT_URI,
         },
         headers={"Accept": "application/json"},
     )
@@ -407,7 +407,7 @@ def github_callback(
     github_access_token = create_access_token(user.id)
 
     response = RedirectResponse(
-        url=f"http://localhost:5173/auth/callback#token={github_access_token}",
+        url=f"{FRONTEND_URL}/auth/callback#token={github_access_token}",
         status_code=307,
     )
 
@@ -422,7 +422,7 @@ def google_login():
 
     params = {
         "client_id": GOOGLE_CLIENT_ID,
-        "redirect_uri": "http://localhost:8000/auth/google/callback",
+        "redirect_uri": GOOGLE_REDIRECT_URI,
         "response_type": "code",
         "scope": "openid email profile",
         "state": state,
@@ -436,6 +436,7 @@ def google_login():
         key="google_auth_state",
         value=state,
         httponly=True,
+        secure=COOKIE_SECURE,
         max_age=300,
         samesite="lax",
     )
@@ -457,7 +458,7 @@ def google_callback(
         "code": code,
         "client_id": GOOGLE_CLIENT_ID,
         "client_secret": GOOGLE_CLIENT_SECRET,
-        "redirect_uri": "http://localhost:8000/auth/google/callback",
+                "redirect_uri": GOOGLE_REDIRECT_URI,
         "grant_type": "authorization_code",
     }
 
@@ -520,7 +521,7 @@ def google_callback(
     access_token = create_access_token(user.id)
 
     response = RedirectResponse(
-        url=f"http://localhost:5173/auth/callback#token={access_token}", status_code=307
+                url=f"{FRONTEND_URL}/auth/callback#token={access_token}", status_code=307
     )
 
     response.delete_cookie("google_auth_state")
