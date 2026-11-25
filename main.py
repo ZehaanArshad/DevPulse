@@ -200,6 +200,7 @@ def get_user_stats(user: User = Depends(get_authorised_user), refresh: bool = Fa
             stats, error = cached_fetch("codeforces", p.handle, fetch_codeforces_all, force=refresh)
         elif platform == "leetcode":
             stats, error = cached_fetch("leetcode", p.handle, fetch_leetcode, force=refresh)
+
         elif platform == "atcoder":
             stats, error = cached_fetch("atcoder", p.handle, fetch_atcoder, force=refresh)
         else:

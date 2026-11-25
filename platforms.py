@@ -51,23 +51,35 @@ LC_QUERY = """query($username: String!) {
     }
 }"""
 
-def fetch_leetcode(handle: str) -> Optional[dict]:
+def fetch_leetcode(handle: str) -> tuple[Optional[dict], Optional[str]]:
     try:
         resp = httpx.post(
             LC_URL,
             json={"query": LC_QUERY, "variables": {"username": handle}},
-            headers={"Referer": "https://leetcode.com"},
+            headers={
+                "Referer": "https://leetcode.com",
+                "User-Agent": "Mozilla/5.0 (compatible; DevPulse/1.0)",
+            },
             timeout=10,
         )
+    except httpx.HTTPError:
+        return None, "unavailable"
+
+    if resp.status_code == 429:
+        return None, "rate_limited"
+
+    try:
         data = resp.json()
+    except ValueError:
+        return None, "unavailable"
 
-    except (httpx.HTTPError, ValueError):
-        return None
+    payload = data.get("data")
+    if payload is None:
+        return None, "unavailable"
 
-    user = (data.get("data") or {}).get("matchedUser")
-
+    user = payload.get("matchedUser")
     if not user:
-        return None
+        return None, "not_found"
 
     solved = {
         row["difficulty"].lower(): row["count"]
@@ -104,7 +116,7 @@ def fetch_leetcode(handle: str) -> Optional[dict]:
 
     solved["topics"]=topics
 
-    return solved
+    return solved, None
 
 CF_STATUS_URL= "https://codeforces.com/api/user.status"
 
@@ -205,8 +217,8 @@ def validate_handle(platform: str, handle:str) -> Optional[str]:
         return error
 
     if platform == "leetcode":
-        stats = fetch_leetcode(handle)
-        return None if stats is not None else "not_found"
+        _, error = fetch_leetcode(handle)
+        return error
 
     if platform == "atcoder":
         return atcoder_exists(handle)
