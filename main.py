@@ -4,7 +4,8 @@ from sqlalchemy.orm import Session
 from database import get_db
 from models import User, Profile
 from schemas import UserCreate, ProfileCreate
-from platforms import fetch_codeforces, fetch_leetcode, fetch_codeforces_solved, validate_handle, fetch_atcoder
+from platforms import fetch_codeforces, fetch_leetcode, fetch_codeforces_solved, validate_handle, fetch_atcoder, fetch_codeforces_all
+from cache import cached_fetch
 from sqlalchemy import func
 from schemas import UserCreate, UserOut, UserLogin, TokenOut
 from auth import (
@@ -189,31 +190,21 @@ def delete_user(
 
 
 @app.get("/users/{user_id}/stats")
-def get_user_stats(user: User = Depends(get_authorised_user)):
+def get_user_stats(user: User = Depends(get_authorised_user), refresh: bool = False):
 
     results = []
 
     for p in user.profiles:
         platform = p.platform.lower()
         if platform == "codeforces":
-            stats, error = fetch_codeforces(p.handle)
-
-            if stats is not None:
-                solved,_ = fetch_codeforces_solved(p.handle)
-
-                if solved:
-                    stats={**stats,**solved}
-
+            stats, error = cached_fetch("codeforces", p.handle, fetch_codeforces_all, force=refresh)
         elif platform == "leetcode":
-            stats = fetch_leetcode(p.handle)
-            error = None
-
+            stats, error = cached_fetch("leetcode", p.handle, fetch_leetcode, force=refresh)
         elif platform == "atcoder":
-            stats, error = fetch_atcoder(p.handle)
-
+            stats, error = cached_fetch("atcoder", p.handle, fetch_atcoder, force=refresh)
         else:
             stats = None
-            error="unsupported_platform"
+            error = "unsupported_platform"
 
         results.append({"platform": p.platform, "handle": p.handle, "stats": stats,"error": error})
 

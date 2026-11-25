@@ -340,3 +340,17 @@ def fetch_atcoder(handle: str) -> tuple[Optional[dict], Optional[str]]:
         "all": solved,
         "activity": activity,
     }, None
+
+def fetch_codeforces_all(handle: str) -> tuple[Optional[dict], Optional[str]]:
+
+    stats, error = fetch_codeforces(handle)
+
+    if stats is None:
+        return None, error
+
+    solved, solved_error = fetch_codeforces_solved(handle)
+
+    if solved is None:
+        return stats, fetch_codeforces_solved # partial: rating only, not cached
+
+    return {**stats, **solved}, None
