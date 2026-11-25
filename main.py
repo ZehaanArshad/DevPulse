@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from database import get_db
 from models import User, Profile
 from schemas import UserCreate, ProfileCreate
-from platforms import fetch_codeforces, fetch_leetcode, fetch_codeforces_solved, validate_handle, fetch_atcoder, fetch_codeforces_all
+from platforms import fetch_codeforces, fetch_leetcode, fetch_codeforces_solved, validate_handle, fetch_atcoder, fetch_codeforces_all, fetch_github
 from cache import cached_fetch
 from sqlalchemy import func
 from schemas import UserCreate, UserOut, UserLogin, TokenOut
@@ -203,6 +203,8 @@ def get_user_stats(user: User = Depends(get_authorised_user), refresh: bool = Fa
 
         elif platform == "atcoder":
             stats, error = cached_fetch("atcoder", p.handle, fetch_atcoder, force=refresh)
+        elif platform == "github":
+            stats, error = cached_fetch("github", p.handle, fetch_github, force=refresh)
         else:
             stats = None
             error = "unsupported_platform"

@@ -4,6 +4,8 @@ from typing import Optional
 from collections import Counter
 from datetime import datetime, timezone, timedelta
 
+from config import GITHUB_TOKEN
+
 CF_URL = "https://codeforces.com/api/user.info"
 
 
@@ -223,6 +225,9 @@ def validate_handle(platform: str, handle:str) -> Optional[str]:
     if platform == "atcoder":
         return atcoder_exists(handle)
 
+    if platform == "github":
+        return github_exists(handle)
+
     return "unsupported_platform"
 
 AT_USER_URL = "https://atcoder.jp/users/"
@@ -352,6 +357,142 @@ def fetch_atcoder(handle: str) -> tuple[Optional[dict], Optional[str]]:
         "all": solved,
         "activity": activity,
     }, None
+
+
+GH_API = "https://api.github.com"
+
+
+def gh_headers() -> dict:
+    headers = {
+        "Accept": "application/vnd.github+json",
+        "User-Agent": "DevPulse/1.0",
+    }
+    if GITHUB_TOKEN:
+        headers["Authorization"] = f"Bearer {GITHUB_TOKEN}"
+    return headers
+
+
+def gh_error(resp) -> str:
+    """Map a failed GitHub response to one of our reason strings."""
+    if resp.status_code == 404:
+        return "not_found"
+    if resp.status_code in (403, 429):  # GitHub uses 403 for rate limits too
+        return "rate_limited"
+    return "unavailable"
+
+
+def github_exists(handle: str) -> Optional[str]:
+    """None if the GitHub user exists, otherwise a reason string."""
+    try:
+        resp = httpx.get(
+            f"{GH_API}/users/{quote(handle, safe='')}",
+            headers=gh_headers(),
+            timeout=10,
+        )
+    except httpx.HTTPError:
+        return "unavailable"
+
+    if resp.status_code == 200:
+        return None
+
+    return gh_error(resp)
+
+
+def fetch_github(handle: str) -> tuple[Optional[dict], Optional[str]]:
+    safe = quote(handle, safe="")
+    headers = gh_headers()
+
+    # 1) the profile itself: required
+    try:
+        resp = httpx.get(f"{GH_API}/users/{safe}", headers=headers, timeout=10)
+        if resp.status_code != 200:
+            return None, gh_error(resp)
+        user = resp.json()
+    except (httpx.HTTPError, ValueError):
+        return None, "unavailable"
+
+    stats = {
+        "name": user.get("name"),
+        "avatar_url": user.get("avatar_url"),
+        "public_repos": user.get("public_repos", 0),
+        "followers": user.get("followers", 0),
+        "following": user.get("following", 0),
+        "stars": 0,
+        "forks": 0,
+        "languages": [],
+        "top_repos": [],
+        "events": {},
+    }
+
+    # If an optional part fails we still return the profile numbers, but with
+    # the reason in `partial`, so cached_fetch will not cache the incomplete result.
+    partial = None
+
+    # 2) own (non-fork) repos: stars, forks, languages, top repos
+    try:
+        resp = httpx.get(
+            f"{GH_API}/users/{safe}/repos",
+            params={"per_page": 100, "sort": "pushed", "type": "owner"},
+            headers=headers,
+            timeout=10,
+        )
+        if resp.status_code == 200:
+            repos = [r for r in resp.json() if not r.get("fork")]
+
+            stats["stars"] = sum(r.get("stargazers_count", 0) for r in repos)
+            stats["forks"] = sum(r.get("forks_count", 0) for r in repos)
+
+            language_counts = Counter(r["language"] for r in repos if r.get("language"))
+            stats["languages"] = [
+                {"name": name, "count": count}
+                for name, count in language_counts.most_common()
+            ]
+
+            top = sorted(repos, key=lambda r: r.get("stargazers_count", 0), reverse=True)[:5]
+            stats["top_repos"] = [
+                {
+                    "name": r["name"],
+                    "stars": r.get("stargazers_count", 0),
+                    "language": r.get("language"),
+                    "url": r.get("html_url"),
+                    "description": r.get("description"),
+                }
+                for r in top
+            ]
+        else:
+            partial = gh_error(resp)
+    except (httpx.HTTPError, ValueError, KeyError):
+        partial = "unavailable"
+
+    # 3) public events: roughly the last 90 days, one count per event per day
+    try:
+        events = Counter()
+        for page in (1, 2, 3):
+            resp = httpx.get(
+                f"{GH_API}/users/{safe}/events/public",
+                params={"per_page": 100, "page": page},
+                headers=headers,
+                timeout=10,
+            )
+            if resp.status_code != 200:
+                partial = partial or gh_error(resp)
+                break
+
+            batch = resp.json()
+            if not batch:
+                break
+
+            for event in batch:
+                events[event["created_at"][:10]] += 1  # "2026-11-22T22:18:46Z" -> day
+
+            if len(batch) < 100:
+                break
+
+        stats["events"] = dict(events)
+    except (httpx.HTTPError, ValueError, KeyError):
+        partial = partial or "unavailable"
+
+    return stats, partial
 
 def fetch_codeforces_all(handle: str) -> tuple[Optional[dict], Optional[str]]:
 
