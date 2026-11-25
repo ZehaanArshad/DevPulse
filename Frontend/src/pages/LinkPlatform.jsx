@@ -10,7 +10,7 @@ const logos = [...dashboardData.devPlatforms, ...dashboardData.problemPlatforms]
 const platforms = [
   { key: 'leetcode', label: 'LeetCode', prefix: 'https://leetcode.com/u/', supported: true },
   { key: 'codeforces', label: 'CodeForces', prefix: 'https://codeforces.com/profile/', supported: true },
-  { key: 'atcoder', label: 'AtCoder', prefix: 'https://atcoder.jp/users/', supported: false },
+  { key: 'atcoder', label: 'AtCoder', prefix: 'https://atcoder.jp/users/', supported: true },
   { key: 'geeksforgeeks', label: 'GeeksForGeeks', prefix: 'https://www.geeksforgeeks.org/user/', supported: false },
 ]
 

@@ -6,6 +6,7 @@ import { linkablePlatforms as linkable } from '../../data/linkablePlatforms'
 const profilePrefix = {
   leetcode: 'https://leetcode.com/u/',
   codeforces: 'https://codeforces.com/profile/',
+  atcoder: 'https://atcoder.jp/users/',
 }
 
 

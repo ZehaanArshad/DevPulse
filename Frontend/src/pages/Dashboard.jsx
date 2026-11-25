@@ -42,7 +42,7 @@ const totalSolved = profiles.reduce((sum, p) => sum + (p.stats?.all ?? 0), 0)
 
 const difficulty = profiles.reduce(
   (acc, p) => ({
-    total: acc.total + (p.stats?.all ?? 0),
+    total: acc.total + (p.stats?.easy ?? 0) + (p.stats?.medium ?? 0) + (p.stats?.hard ?? 0),
     easy: acc.easy + (p.stats?.easy ?? 0),
     medium: acc.medium + (p.stats?.medium ?? 0),
     hard: acc.hard + (p.stats?.hard ?? 0),
